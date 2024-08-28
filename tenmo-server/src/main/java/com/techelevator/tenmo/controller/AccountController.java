@@ -20,7 +20,10 @@ import java.util.List;
 @RestController
 @PreAuthorize("isAuthenticated()")
 public class AccountController {
+
+    @Autowired
     private TransferStatusDao transferStatusDao;
+    @Autowired
     private UserDao userDao;
     @Autowired
     private AccountDao accountDao;
@@ -42,7 +45,8 @@ public class AccountController {
     @RequestMapping(path = "account/transfers", method = RequestMethod.GET)
     public List<Transfer> getTransferByUser(Principal principal) {
         User user = userDao.getUserByUsername(principal.getName());
-        return transferDao.getTransferByUser(user.getId());
+        Account account = accountDao.getAccountByUserId(user.getId());
+        return transferDao.getTransferByUser(account.getAccount_id());
     }
 
     @RequestMapping(path = "transfer/{id}", method = RequestMethod.GET)
@@ -59,9 +63,9 @@ public class AccountController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         // create a new transfer
-        transferDao.sendTeBucks(user.getId(), transfer.getAccount_to(), transfer.getAmount());
+        transferDao.sendTeBucks(transfer.getAccount_from(), transfer.getAccount_to(), transfer.getAmount());
         // adjust balances accordingly
-        accountDao.transferBalance(user.getId(), transfer.getAccount_to(), transfer.getAmount());
+        accountDao.transferBalance(account.getAccount_id(), transfer.getAccount_to(), transfer.getAmount());
     }
 
     @RequestMapping(path = "account/transfers/request", method = RequestMethod.POST)
@@ -72,7 +76,7 @@ public class AccountController {
             // throw 403
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        transferDao.requestTeBucks(user.getId(), transfer.getAccount_to(), transfer.getAmount());
+        transferDao.requestTeBucks(account.getAccount_id(), transfer.getAccount_to(), transfer.getAmount());
     }
 
     @RequestMapping(path = "/account/transfer", method = RequestMethod.PUT)
@@ -83,16 +87,14 @@ public class AccountController {
             // throw 403
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-
-
-
+        transferDao.updateTransactionStatus(transfer);
     }
 
     @RequestMapping(path = "/account/transfer/{type}", method = RequestMethod.GET)
     public void viewPending(@PathVariable String type, Principal principal) {
         User user = userDao.getUserByUsername(principal.getName());
         TransferStatus status = transferStatusDao.getStatusByName(type);
-        transferDao.getTransfersByType(user.getId(), status.getTransfer_status_desc());
+        Account account = accountDao.getAccountByUserId(user.getId());
+        transferDao.getTransfersByType(account.getAccount_id(), type);
     }
-
 }

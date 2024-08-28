@@ -41,7 +41,7 @@ public class AccountDao {
     }
 
     public void transferBalance(int sender, int receiver, double amountToAdd){
-        String sql = "BEGIN TRANSACTION; UPDATE account SET amount = amount + ? WHERE account_id = ?; UPDATE account SET amount = amount - ? WHERE account_id = ?; COMMIT;";
+        String sql = "BEGIN TRANSACTION; UPDATE account SET balance = balance + ? WHERE account_id = ?; UPDATE account SET balance = balance - ? WHERE account_id = ?; COMMIT;";
         jdbcTemplate.update(sql, amountToAdd, receiver, amountToAdd, sender);
     }
 

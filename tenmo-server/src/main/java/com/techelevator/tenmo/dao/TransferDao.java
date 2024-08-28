@@ -31,7 +31,7 @@ public class TransferDao {
 
     public List<Transfer> getTransferByUser(int user_id) {
         List<Transfer> transfers = new ArrayList<>();
-        String sql = " select * from transfer where account_from = ? OR account_to = ? ;";
+        String sql = " select * from transfer where account_from = ? OR account_to = ?;";
 
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, user_id, user_id);
 
@@ -45,9 +45,9 @@ public class TransferDao {
     public List<Transfer> getTransfersByType(int user_id, String type ) {
         List<Transfer> transferTypeList = new ArrayList<>();
 
-        String sql = " select transfer_id, transfer_type_id,transfer_status_id,account_from,account_to,amount from transfer t join transfer_type tt on tt.transfer_type_id = t.transfer_type_id where user_id = ? and transfer_type_desc = ?;";
+        String sql = "SELECT transfer.transfer_id, transfer.transfer_type_id, transfer.transfer_status_id, transfer.account_from, transfer.account_to, transfer.amount FROM transfer JOIN transfer_status ON transfer_status.transfer_status_id = transfer.transfer_status_id WHERE (account_to = ? OR account_from = ?) AND transfer_status_desc ILIKE '?';";
 
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, user_id, type);
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, user_id, user_id, type);
 
         while (results.next()) {
             transferTypeList.add(mapRowToTransfer(results));
@@ -59,7 +59,7 @@ public class TransferDao {
 
     public int sendTeBucks(int senderId, int receiverId, double amount) {
         int id = 0;
-        String sql = "insert into transfer (transfer_type_id,transfer_status_id,account_from,account_to,amount) values(2,2,?,?,?) returning transfer_id;";
+        String sql = "insert into transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) values(2,2,?,?,?) returning transfer_id;";
 
         id = jdbcTemplate.queryForObject(sql, int.class, senderId, receiverId, amount);
         return id;
@@ -73,7 +73,8 @@ public class TransferDao {
         return id;
     }
     public void updateTransactionStatus(Transfer transfer){
-        String sql = "update transfer"
+        String sql = "UPDATE transfer SET transfer_status = ? WHERE transfer_id = ?";
+        jdbcTemplate.update(sql, transfer.getTransfer_status_id(), transfer.getTransfer_id());
     }
 
     private Transfer mapRowToTransfer(SqlRowSet rs) {
