@@ -1,11 +1,22 @@
 package com.techelevator.tenmo.model;
 
+import org.springframework.stereotype.Component;
+
+import javax.validation.constraints.NotBlank;
+
+@Component
 public class Transfer {
+    @NotBlank
     private int transfer_id;
+    @NotBlank
     private int transfer_type_id;
+    @NotBlank
     private int transfer_status_id;
+    @NotBlank
     private int account_from;
+    @NotBlank
     private int account_to;
+    @NotBlank
     private double amount;
 
     public int getTransfer_id() {

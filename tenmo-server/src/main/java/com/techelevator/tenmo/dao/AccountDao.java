@@ -15,10 +15,9 @@ public class AccountDao {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Account getAccountById(int id) {
+    public Account getAccountByUserId(int id) {
         Account account = new Account();
-        String sql = "SELECT * from account where account_id = ?; ";
-
+        String sql = "SELECT * from account where user_id = ?;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
 
         if (results.next()) {
@@ -39,6 +38,11 @@ public class AccountDao {
 
     }
 
+    public void transferBalance(int sender, int receiver, double amountToAdd){
+        String sql = "BEGIN TRANSACTION; UPDATE account SET amount = amount + ? WHERE account_id = ?; UPDATE account SET amount = amount - ? WHERE account_id = ?; COMMIT;";
+        jdbcTemplate.update(sql, amountToAdd, receiver, amountToAdd, sender);
+    }
+
     private Account mapRowToAccount(SqlRowSet rs) {
         Account Account = new Account();
         Account.setUser_id(rs.getInt("user_id"));
@@ -48,3 +52,4 @@ public class AccountDao {
         return Account;
 
     }
+}

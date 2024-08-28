@@ -26,6 +26,7 @@ public class TransferDao {
         }
         return transfer;
     }
+
     public List<Transfer> getTransferByUser(int user_id){
         List<Transfer> transfers = new ArrayList<>();
         String sql = " select * from transfer where account_from = ? OR account_to = ? ;";
@@ -38,14 +39,15 @@ public class TransferDao {
         return transfers;
 
     }
+
     public int sendTeBucks(int senderId, int receiverId, double amount){
         int id = 0;
         String sql = "insert into transfer (transfer_type_id,transfer_status_id,account_from,account_to,amount) values(2,2,?,?,?) returning transfer_id;";
 
         id = jdbcTemplate.queryForObject(sql,int.class,senderId,receiverId,amount);
         return id;
-
     }
+
     public int requestTeBucks(int senderId, int receiverId, double amount) {
         int id = 0;
         String sql = "insert into transfer (transfer_type_id,transfer_status_id,account_from,account_to,amount) values(1,1,?,?,?) returning transfer_id;";

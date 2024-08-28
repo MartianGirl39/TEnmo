@@ -1,7 +1,14 @@
 package com.techelevator.tenmo.model;
 
+import org.springframework.stereotype.Component;
+
+import javax.validation.constraints.NotBlank;
+
+@Component
 public class TransferStatus {
+    @NotBlank
     private int transfer_status_id;
+    @NotBlank
     private String transfer_status_desc;
 
     public int getTransfer_status_id() {

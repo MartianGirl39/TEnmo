@@ -1,13 +1,17 @@
 package com.techelevator.tenmo.model;
 
+import org.springframework.stereotype.Component;
+
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
+@Component
 public class Account {
     @NotBlank
     private int account_id;
     @NotBlank
     private int user_id;
+    @NotBlank
     @Min(0)
     private double balance;
 
@@ -33,14 +37,5 @@ public class Account {
 
     public void setBalance(double balance) {
         this.balance = balance;
-    }
-
-    @Override
-    public String toString() {
-        return "Account{" +
-                "account_id=" + account_id +
-                ", user_id=" + user_id +
-                ", balance=" + balance +
-                '}';
     }
 }
