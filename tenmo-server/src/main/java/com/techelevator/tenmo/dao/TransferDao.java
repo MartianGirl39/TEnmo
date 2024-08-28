@@ -75,7 +75,7 @@ public class TransferDao {
         return id;
     }
     public void updateTransactionStatus(Transfer transfer){
-        String sql = "UPDATE transfer SET transfer_status = ? WHERE transfer_id = ?";
+        String sql = "UPDATE transfer SET transfer_status_id = ? WHERE transfer_id = ?";
         jdbcTemplate.update(sql, transfer.getTransfer_status_id(), transfer.getTransfer_id());
     }
 
