@@ -3,20 +3,20 @@ package com.techelevator.tenmo.model;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
-@Component
 public class Transfer {
-    @NotBlank
+    @NotNull
     private int transfer_id;
-    @NotBlank
+    @NotNull
     private int transfer_type_id;
-    @NotBlank
+    @NotNull
     private int transfer_status_id;
-    @NotBlank
+    @NotNull
     private int account_from;
-    @NotBlank
+    @NotNull
     private int account_to;
-    @NotBlank
+    @NotNull
     private double amount;
 
     public int getTransfer_id() {

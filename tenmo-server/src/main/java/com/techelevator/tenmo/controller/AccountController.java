@@ -23,36 +23,37 @@ import java.util.List;
 @PreAuthorize("isAuthenticated()")
 public class AccountController {
 
+    @Autowired
     private UserDao userDao;
     @Autowired
     private AccountDao accountDao;
     @Autowired
     private TransferDao transferDao;
 
-    @RequestMapping(path="account", method=RequestMethod.GET)
+    @RequestMapping(path="/account", method=RequestMethod.GET)
     public Account getAccount(Principal principal){
         User user = userDao.getUserByUsername(principal.getName());
         return accountDao.getAccountByUserId(user.getId());
     }
 
-    @RequestMapping(path="account/balance", method = RequestMethod.GET)
+    @RequestMapping(path="/account/balance", method = RequestMethod.GET)
     public double getAccountBalance(Principal principal){
         User user = userDao.getUserByUsername(principal.getName());
         return accountDao.getAccountByUserId(user.getId()).getBalance();
     }
 
-    @RequestMapping(path="account/transfers", method=RequestMethod.GET)
+    @RequestMapping(path="/account/transfers", method=RequestMethod.GET)
     public List<Transfer> getTransferByUser(Principal principal){
         User user = userDao.getUserByUsername(principal.getName());
         return transferDao.getTransferByUser(user.getId());
     }
 
-    @RequestMapping(path="transfer/{id}", method=RequestMethod.GET)
+    @RequestMapping(path="/transfer/{id}", method=RequestMethod.GET)
     public Transfer getTransferById(@PathVariable int id){
         return transferDao.getTransferById(id);
     }
 
-    @RequestMapping(path="account/transfers/send", method=RequestMethod.POST)
+    @RequestMapping(path="/account/transfers/send", method=RequestMethod.POST)
     public void sendTransfer(@RequestBody Transfer transfer, Principal principal){
         User user = userDao.getUserByUsername(principal.getName());
         if(user.getId() != transfer.getAccount_from()){
@@ -65,18 +66,16 @@ public class AccountController {
         accountDao.transferBalance(user.getId(), transfer.getAccount_to(), transfer.getAmount());
     }
 
-    @RequestMapping(path="account/transfers/request", method=RequestMethod.POST)
+    @RequestMapping(path="/account/transfers/request", method=RequestMethod.POST)
     public void requestTransfer(@RequestBody Transfer transfer, Principal principal){
         User user = userDao.getUserByUsername(principal.getName());
-        if(user.getId() != transfer.getAccount_from()){
+        if(user == null){
+
+        }
+        else if(user.getId() != transfer.getAccount_from()){
             // throw 403
             throw  new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         transferDao.requestTeBucks(user.getId(), transfer.getAccount_to(), transfer.getAmount());
-    }
-
-    @RequestMapping(path="account/transfer/{id}", method=RequestMethod.PUT)
-    public void updateTransfer(@RequestBody Transfer transfer){
-
     }
 }

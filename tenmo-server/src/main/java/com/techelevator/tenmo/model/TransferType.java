@@ -3,12 +3,12 @@ package com.techelevator.tenmo.model;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
-@Component
 public class TransferType {
-    @NotBlank
+    @NotNull
     private int transfer_type_id;
-    @NotBlank
+    @NotNull
     private String transfer_type_desc;
 
     public int getTransfer_type_id() {

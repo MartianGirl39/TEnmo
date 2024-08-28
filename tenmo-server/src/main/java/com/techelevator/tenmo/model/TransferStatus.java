@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotBlank;
 
-@Component
 public class TransferStatus {
     @NotBlank
     private int transfer_status_id;

@@ -4,14 +4,14 @@ import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
-@Component
 public class Account {
-    @NotBlank
+    @NotNull
     private int account_id;
-    @NotBlank
+    @NotNull
     private int user_id;
-    @NotBlank
+    @NotNull
     @Min(0)
     private double balance;
 
