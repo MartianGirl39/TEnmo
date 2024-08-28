@@ -72,7 +72,7 @@ public class AccountController {
     public void requestTransfer(@RequestBody Transfer transfer, Principal principal) {
         User user = userDao.getUserByUsername(principal.getName());
         Account account = accountDao.getAccountByUserId(user.getId());
-        if (account.getAccount_id() != transfer.getAccount_from()) {
+        if (account.getAccount_id() != transfer.getAccount_to()) {
             // throw 403
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
@@ -91,10 +91,10 @@ public class AccountController {
     }
 
     @RequestMapping(path = "/account/transfer/{type}", method = RequestMethod.GET)
-    public void viewPending(@PathVariable String type, Principal principal) {
+    public List<Transfer> viewPending(@PathVariable String type, Principal principal) {
         User user = userDao.getUserByUsername(principal.getName());
         TransferStatus status = transferStatusDao.getStatusByName(type);
         Account account = accountDao.getAccountByUserId(user.getId());
-        transferDao.getTransfersByType(account.getAccount_id(), type);
+        return transferDao.getTransfersByType(account.getAccount_id(), status.getTransfer_status_desc());
     }
 }

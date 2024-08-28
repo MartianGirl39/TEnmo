@@ -45,11 +45,16 @@ public class TransferDao {
     public List<Transfer> getTransfersByType(int user_id, String type ) {
         List<Transfer> transferTypeList = new ArrayList<>();
 
-        String sql = "SELECT transfer.transfer_id, transfer.transfer_type_id, transfer.transfer_status_id, transfer.account_from, transfer.account_to, transfer.amount FROM transfer JOIN transfer_status ON transfer_status.transfer_status_id = transfer.transfer_status_id WHERE (account_to = ? OR account_from = ?) AND transfer_status_desc ILIKE '?';";
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, user_id, user_id, type);
-
-        while (results.next()) {
-            transferTypeList.add(mapRowToTransfer(results));
+//        String sql = "SELECT transfer.transfer_id, transfer.transfer_type_id, transfer.transfer_status_id, transfer.account_to, transfer.account_from, transfer.amount FROM transfer JOIN transfer_status ON transfer_status.transfer_status_id = transfer.transfer_status_id WHERE (transfer.account_to = ? OR transfer.account_from = ?) AND transfer_status.transfer_status_desc ILIKE ?;";
+        List<Transfer> toSort = getTransferByUser(user_id);
+        String sql = "SELECT * FROM transfer_status WHERE transfer_status_desc = ?";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, type);
+        if(results.next()) {
+            for(Transfer transfer : toSort){
+                if(results.getInt("transfer_status_id") == transfer.getTransfer_status_id()){
+                    transferTypeList.add(transfer);
+                }
+            }
         }
         return transferTypeList;
     }
