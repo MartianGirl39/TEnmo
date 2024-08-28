@@ -30,11 +30,4 @@ public class Authority {
    public int hashCode() {
       return Objects.hash(name);
    }
-
-   @Override
-   public String toString() {
-      return "Authority{" +
-         "name=" + name +
-         '}';
-   }
 }
