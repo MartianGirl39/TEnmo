@@ -46,15 +46,12 @@ public class TransferDao {
         List<Transfer> transferTypeList = new ArrayList<>();
 
         String sql = "SELECT transfer.transfer_id, transfer.transfer_type_id, transfer.transfer_status_id, transfer.account_from, transfer.account_to, transfer.amount FROM transfer JOIN transfer_status ON transfer_status.transfer_status_id = transfer.transfer_status_id WHERE (account_to = ? OR account_from = ?) AND transfer_status_desc ILIKE '?';";
-
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, user_id, user_id, type);
 
         while (results.next()) {
             transferTypeList.add(mapRowToTransfer(results));
         }
         return transferTypeList;
-
-
     }
 
     public int sendTeBucks(int senderId, int receiverId, double amount) {
@@ -86,7 +83,5 @@ public class TransferDao {
         Transfer.setAccount_to(rs.getInt("account_to"));
         Transfer.setAmount(rs.getDouble("amount"));
         return Transfer;
-
     }
-
 }
