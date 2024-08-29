@@ -3,7 +3,10 @@ package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.model.UserCredentials;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class ConsoleService {
@@ -86,6 +89,14 @@ public class ConsoleService {
 
     public void printErrorMessage() {
         System.out.println("An error occurred. Check the log for details.");
+    }
+    public static String readAsciiArtFromFile(String filePath) {
+        try {
+            return Files.readString(Paths.get(filePath));
+        } catch (IOException e) {
+            System.err.println("Error reading ASCII art file: " + e.getMessage());
+            return "";
+        }
     }
 
 }

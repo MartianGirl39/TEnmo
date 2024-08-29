@@ -8,6 +8,7 @@ import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
 import com.techelevator.tenmo.services.TenmoService;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Scanner;
@@ -28,7 +29,10 @@ public class App {
     }
 
     private void run() {
-        consoleService.printGreeting();
+
+        String TEnmo = consoleService.readAsciiArtFromFile("C:/Users/Student/workspace/java-blue-module2capstone-team6/tenmo-client/src/main/resources/banner.txt");
+        System.out.println(TEnmo);
+
         loginMenu();
         if (currentUser != null) {
             mainMenu();
