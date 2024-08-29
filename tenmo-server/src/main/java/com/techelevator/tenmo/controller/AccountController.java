@@ -76,7 +76,7 @@ public class AccountController {
             // throw 403
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        transferDao.requestTeBucks(account.getAccount_id(), transfer.getAccount_to(), transfer.getAmount());
+        transferDao.requestTeBucks(account.getAccount_id(), transfer.getAccount_from(), transfer.getAmount());
     }
 
     @RequestMapping(path = "/account/transfer", method = RequestMethod.PUT)
