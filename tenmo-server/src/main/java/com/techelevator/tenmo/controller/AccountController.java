@@ -5,9 +5,9 @@ import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.TransferStatus;
 import com.techelevator.tenmo.model.User;
-import com.techelevator.tenmo.model.dto.ClientTransferDto;
 import com.techelevator.tenmo.model.dto.TransferDto;
 import com.techelevator.tenmo.model.dto.TransferStatusDto;
+import com.techelevator.tenmo.model.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +16,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -198,8 +199,39 @@ public class AccountController {
         return transferStatusDao.getStatusById(id).getTransfer_status_desc();
     }
 
-    @RequestMapping(path="transfer/type/{id}", method=RequestMethod.GET)
+    @RequestMapping(path="/transfer/type/{id}", method=RequestMethod.GET)
     public String getTypeById(@PathVariable int id){
         return transferTypeDao.getTypeById(id).getTransfer_type_desc();
+    }
+
+    @RequestMapping(path="/user/account/{id}", method=RequestMethod.GET)
+    public UserDto getUserById(@PathVariable int id){
+        UserDto userDto = new UserDto();
+        Account account = accountDao.getAccountById(id);
+        User user = userDao.getUserById(account.getUser_id());
+        userDto.setUsername(user.getUsername());
+        userDto.setAccount_id(account.getAccount_id());
+        return userDto;
+    }
+
+    @RequestMapping(path="/user/account", method=RequestMethod.GET)
+    public List<UserDto> getUsers(Principal principal){
+        List<UserDto> userDtos = new ArrayList<>();
+        User user = userDao.getUserByUsername(principal.getName());
+        if(user == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        Account account = accountDao.getAccountByUserId(user.getId());
+        if(account == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        List<Account> accounts = accountDao.listUser(account.getAccount_id());
+        for(Account acc : accounts){
+            UserDto newUser = new UserDto();
+            newUser.setAccount_id(acc.getAccount_id());
+            newUser.setUsername(userDao.getUserById(acc.getUser_id()).getUsername());
+            userDtos.add(newUser);
+        }
+        return userDtos;
     }
 }
