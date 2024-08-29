@@ -14,7 +14,7 @@ public class Transfer {
 
     private double amount;
 
-    public Transfer(){
+    public Transfer() {
 
     }
 
@@ -77,13 +77,13 @@ public class Transfer {
 
     @Override
     public String toString() {
-        return "Transfer{" +
-                "transfer_id=" + transfer_id +
-                ", transfer_type_id=" + transfer_type_id +
-                ", transfer_status_id=" + transfer_status_id +
-                ", account_from=" + account_from +
-                ", account_to=" + account_to +
-                ", amount=" + amount +
-                '}';
+        return "Transfer #: " + transfer_id + "\n" +
+                "\t| Transfer Type: " + transfer_type_id + "\n" +
+                "\t| Transfer Status: " + transfer_status_id + "\n" +
+                "\t| Account From: " + account_from + "\n" +
+                "\t| Account To: " + account_to + "\n" +
+                "\t| Transfer Amount: " + amount + "\n";
+
+
     }
 }

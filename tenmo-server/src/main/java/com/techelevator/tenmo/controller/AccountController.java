@@ -198,7 +198,7 @@ public class AccountController {
         return transferStatusDao.getStatusById(id).getTransfer_status_desc();
     }
 
-    @RequestMapping(path="transfer/type/{id}", method=RequestMethod.GET)
+    @RequestMapping(path="/transfer/type/{id}", method=RequestMethod.GET)
     public String getTypeById(@PathVariable int id){
         return transferTypeDao.getTypeById(id).getTransfer_type_desc();
     }
