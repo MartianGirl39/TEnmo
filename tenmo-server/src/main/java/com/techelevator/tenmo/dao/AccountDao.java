@@ -18,7 +18,7 @@ public class AccountDao {
     }
 
     public Account getAccountByUserId(int id) {
-        Account account = new Account();
+        Account account = null;
         String sql = "SELECT * FROM account WHERE user_id = ?;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
 
@@ -28,16 +28,27 @@ public class AccountDao {
         return account;
     }
 
-    public List<Account> listUser() {
-        List<Account> account = new ArrayList<>();
-        String sql = "SELECT * from account;";
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
+    public Account getAccountById(int id) {
+        Account account = null;
+        String sql = "SELECT * FROM account WHERE account_id = ?;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
 
+        if (results.next()) {
+            account = mapRowToAccount(results);
+        }
+        return account;
+    }
+
+    public List<Account> listUser() {
+        // creates a list of accounts
+        List<Account> account = new ArrayList<>();
+        // select every account from account
+        String sql = "SELECT * FROM account;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
         while (results.next()) {
             account.add(mapRowToAccount(results));
         }
         return account;
-
     }
 
     public void transferBalance(int sender, int receiver, double amountToAdd){

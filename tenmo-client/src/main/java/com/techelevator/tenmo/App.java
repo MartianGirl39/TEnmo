@@ -1,10 +1,16 @@
 package com.techelevator.tenmo;
 
+import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
 import com.techelevator.tenmo.services.TenmoService;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Scanner;
 
 public class App {
     private final TenmoService tenmoService = new TenmoService();
@@ -98,20 +104,102 @@ public class App {
     }
 
     private void viewPendingRequests() {
-        System.out.println(tenmoService.viewPending("Pending"));
+        Transfer[] pending = tenmoService.viewPending("Pending");
+        System.out.println(pending.length);
+        for(Transfer transfer: pending){
+            System.out.println(transfer);
+        }
 
-
-
+        Transfer transfer = null;
+        boolean isValid = false;
+        while(!isValid){
+            String option = consoleService.promptForString("Enter transaction id to change or hit x to exit");
+            if(option == "x"){
+                isValid = true;
+                continue;
+            }
+            int transactionIdToChange = 0;
+            try {
+                transactionIdToChange = Integer.parseInt(option);
+            }
+            catch (NumberFormatException e){
+                System.out.println("Enter a valid number or x");
+                continue;
+            }
+            transfer = tenmoService.getTransferById(transactionIdToChange);
+            if(transfer != null){
+                isValid = true;
+            }
+            System.out.println("Please enter a valid transaction id");
+        }
+        isValid = false;
+        while(!isValid){
+            int option = consoleService.promptForInt("Press 1 to approve \nPress 2 to reject");
+            if (option == 1){
+                Transfer updated = transfer;
+                updated.setTransfer_status_id(2);
+                tenmoService.changeTransferStatus(updated);
+                break;
+            }
+            else if (option == 2){
+                Transfer updated = transfer;
+                updated.setTransfer_status_id(3);
+                tenmoService.changeTransferStatus(updated);
+                break;
+            }
+            else {
+                System.out.println("Please enter a valid option");
+            }
+        }
     }
 
     private void sendBucks() {
-        // TODO Auto-generated method stub
-
+        boolean isValid = false;
+        Account accountToReceiveMoney = null;
+        while(!isValid) {
+            System.out.println("Select user to send TE bucks");
+            System.out.println("__________________________________\n");
+            Account[] accounts = tenmoService.getAccounts();
+            for (Account account : accounts) {
+                System.out.println(account);
+                System.out.println("__________________________________");
+            }
+            int input = consoleService.promptForInt("Select user by account_id: ");
+            accountToReceiveMoney = tenmoService.getAccountById(input);
+            if(accountToReceiveMoney != null){
+                isValid = true;
+            }
+        }
+        BigDecimal amount = consoleService.promptForBigDecimal("Select the amount to give: ");
+        Transfer transfer = new Transfer();
+        transfer.setAccount_to(accountToReceiveMoney.getAccount_id());
+        transfer.setAmount(amount.doubleValue());
+        transfer.setAccount_from(tenmoService.getUserAccount().getAccount_id());
+        tenmoService.sendTEBucksTo(transfer);
     }
 
     private void requestBucks() {
-        // TODO Auto-generated method stub
-
+        boolean isValid = false;
+        Account accountToReceiveMoney = null;
+        while(!isValid) {
+            System.out.println("Select user to request TE bucks from");
+            System.out.println("__________________________________\n");
+            Account[] accounts = tenmoService.getAccounts();
+            for (Account account : accounts) {
+                System.out.println(account);
+                System.out.println("__________________________________");
+            }
+            int input = consoleService.promptForInt("Select user by account_id: ");
+            accountToReceiveMoney = tenmoService.getAccountById(input);if(accountToReceiveMoney != null){
+                isValid = true;
+            }
+        }
+        BigDecimal amount = consoleService.promptForBigDecimal("Select the amount to receive: ");
+        Transfer transfer = new Transfer();
+        transfer.setAccount_from(accountToReceiveMoney.getAccount_id());
+        transfer.setAmount(amount.doubleValue());
+        transfer.setAccount_to(tenmoService.getUserAccount().getAccount_id());
+        tenmoService.requestTEBucksFrom(transfer);
     }
 
 }

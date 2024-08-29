@@ -42,16 +42,20 @@ public class TransferDao {
 
     }
 
-    public List<Transfer> getTransfersByType(int user_id, String type) {
+    public List<Transfer> getTransfersByType(int user_id, String status_id) {
         List<Transfer> transferTypeList = new ArrayList<>();
 
+        // SELECT * FROM transfer WHERE account_to = 2006 OR account_from = 2006 AND transfer_type_id = 1;
+
+//        String sql = "SELECT * FROM transfer WHERE account_to = ? OR account_from = ? AND transfer_type_id = ?";
+//
         String sql = "SELECT t.* FROM transfer t " +
                 "JOIN account a ON t.account_from = a.account_id OR t.account_to = a.account_id " +
                 "JOIN tenmo_user u ON a.user_id = u.user_id " +
                 "JOIN transfer_status ts ON t.transfer_status_id = ts.transfer_status_id " +
-                "WHERE u.user_id = ? AND ts.transfer_status_desc = ?";
+                "WHERE account_id = ? AND ts.transfer_status_desc = ?";
 
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, user_id, type);
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, user_id, status_id);
 
         while (results.next()) {
             Transfer transfer = mapRowToTransfer(results);
@@ -73,7 +77,6 @@ public class TransferDao {
     public int requestTeBucks(int senderId, int receiverId, double amount) {
         int id = 0;
         String sql = "insert into transfer (transfer_type_id,transfer_status_id,account_from,account_to,amount) values(1,1,?,?,?) returning transfer_id;";
-
         id = jdbcTemplate.queryForObject(sql, int.class, senderId, receiverId, amount);
         return id;
     }
