@@ -4,8 +4,10 @@ import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
+import com.techelevator.tenmo.services.TenmoService;
 
 public class App {
+    private final TenmoService tenmoService = new TenmoService();
 
     private static final String API_BASE_URL = "http://localhost:8080/";
 
@@ -26,6 +28,7 @@ public class App {
             mainMenu();
         }
     }
+
     private void loginMenu() {
         int menuSelection = -1;
         while (menuSelection != 0 && currentUser == null) {
@@ -55,6 +58,7 @@ public class App {
     private void handleLogin() {
         UserCredentials credentials = consoleService.promptForCredentials();
         currentUser = authenticationService.login(credentials);
+        tenmoService.setToken(currentUser.getToken() );
         if (currentUser == null) {
             consoleService.printErrorMessage();
         }
@@ -84,28 +88,30 @@ public class App {
         }
     }
 
-	private void viewCurrentBalance() {
-		// TODO Auto-generated method stub
-	}
+    private void viewCurrentBalance() {
+        System.out.println(tenmoService.getAccountBalance() );
+    }
 
-	private void viewTransferHistory() {
-		// TODO Auto-generated method stub
-		
-	}
+    private void viewTransferHistory() {
+        System.out.println(tenmoService.getTransferByUser() );
 
-	private void viewPendingRequests() {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	private void sendBucks() {
-		// TODO Auto-generated method stub
-		
-	}
+    private void viewPendingRequests() {
+        System.out.println(tenmoService.viewPending("Pending"));
 
-	private void requestBucks() {
-		// TODO Auto-generated method stub
-		
-	}
+
+
+    }
+
+    private void sendBucks() {
+        // TODO Auto-generated method stub
+
+    }
+
+    private void requestBucks() {
+        // TODO Auto-generated method stub
+
+    }
 
 }
