@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class TransferStatusDao {
     private JdbcTemplate jdbcTemplate;
 
-    TransferStatusDao(JdbcTemplate jdbcTemplate) {
+    public TransferStatusDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

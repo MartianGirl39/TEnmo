@@ -13,7 +13,7 @@ public class TransferTypeDao {
 
     private JdbcTemplate jdbcTemplate;
 
-    TransferTypeDao(JdbcTemplate jdbcTemplate){
+    public TransferTypeDao(JdbcTemplate jdbcTemplate){
         this.jdbcTemplate = jdbcTemplate;
     }
 

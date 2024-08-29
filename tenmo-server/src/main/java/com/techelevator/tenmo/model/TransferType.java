@@ -11,6 +11,15 @@ public class TransferType {
     @NotNull
     private String transfer_type_desc;
 
+    public TransferType(){
+
+    }
+
+    public TransferType(int transfer_type_id, String transfer_type_desc) {
+        this.transfer_type_id = transfer_type_id;
+        this.transfer_type_desc = transfer_type_desc;
+    }
+
     public int getTransfer_type_id() {
         return transfer_type_id;
     }

@@ -10,6 +10,15 @@ public class TransferStatus {
     @NotBlank
     private String transfer_status_desc;
 
+    public TransferStatus(){
+
+    }
+
+    public TransferStatus(int transfer_status_id, String transfer_status_desc) {
+        this.transfer_status_id = transfer_status_id;
+        this.transfer_status_desc = transfer_status_desc;
+    }
+
     public int getTransfer_status_id() {
         return transfer_status_id;
     }

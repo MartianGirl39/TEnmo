@@ -19,7 +19,7 @@ public class AccountDao {
 
     public Account getAccountByUserId(int id) {
         Account account = new Account();
-        String sql = "SELECT * from account where user_id = ?;";
+        String sql = "SELECT * FROM account WHERE user_id = ?;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
 
         if (results.next()) {
@@ -50,8 +50,6 @@ public class AccountDao {
         Account.setUser_id(rs.getInt("user_id"));
         Account.setAccount_id(rs.getInt("account_id"));
         Account.setBalance(rs.getDouble("balance"));
-
         return Account;
-
     }
 }
