@@ -39,12 +39,12 @@ public class AccountDao {
         return account;
     }
 
-    public List<Account> listUser() {
+    public List<Account> listUser(int account_id) {
         // creates a list of accounts
         List<Account> account = new ArrayList<>();
         // select every account from account
-        String sql = "SELECT * FROM account;";
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
+        String sql = "SELECT * FROM account WHERE account_id != ?;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, account_id);
         while (results.next()) {
             account.add(mapRowToAccount(results));
         }

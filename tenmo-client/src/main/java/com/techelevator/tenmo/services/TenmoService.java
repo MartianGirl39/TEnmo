@@ -4,6 +4,8 @@ import com.techelevator.exceptions.InsufficientFunds;
 import com.techelevator.exceptions.TenmoRequestException;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.TransferDto;
+import com.techelevator.tenmo.model.TransferStatusDto;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -35,6 +37,20 @@ public class TenmoService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(token);
         return new HttpEntity<>(transfer, headers);
+    }
+
+    private HttpEntity<TransferDto> makeTransferDtoEntity(TransferDto transfer) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(token);
+        return new HttpEntity<>(transfer, headers);
+    }
+
+    private HttpEntity<TransferStatusDto> makeTransferStatusDtoEntity(TransferStatusDto transferStatusDto){
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(token);
+        return new HttpEntity<>(transferStatusDto, headers);
     }
 
     public Account getUserAccount() {
@@ -72,19 +88,20 @@ public class TenmoService {
     }
 
     // TODO: make this with a transfer dto
-    public void sendTEBucksTo(Transfer transfer)throws TenmoRequestException {
+    public void sendTEBucksTo(TransferDto transfer)throws TenmoRequestException {
         try {
-            restTemplate.exchange(API_BASE_URL + "account/transfers/send", HttpMethod.POST, makeTransferEntity(transfer), Void.class);
-        }catch (HttpClientErrorException e){
+            restTemplate.exchange(API_BASE_URL + "account/transfers/send", HttpMethod.POST, makeTransferDtoEntity(transfer), Void.class);
+        }
+        catch (HttpClientErrorException e){
             throw new InsufficientFunds("Insufficient Funds", e.getStatusCode().value());
         }
     }
 
-    public void requestTEBucksFrom(Transfer transfer){
-        restTemplate.exchange(API_BASE_URL + "account/transfers/request", HttpMethod.POST, makeTransferEntity(transfer), Void.class);
+    public void requestTEBucksFrom(TransferDto transfer){
+        restTemplate.exchange(API_BASE_URL + "account/transfers/request", HttpMethod.POST, makeTransferDtoEntity(transfer), Void.class);
     }
 
-    public void changeTransferStatus(Transfer transfer){
-        restTemplate.exchange(API_BASE_URL + "account/transfer", HttpMethod.PUT, makeTransferEntity(transfer), Void.class);
+    public void changeTransferStatus(TransferStatusDto transfer){
+        restTemplate.exchange(API_BASE_URL + "account/transfer", HttpMethod.PUT, makeTransferStatusDtoEntity(transfer), Void.class);
     }
 }

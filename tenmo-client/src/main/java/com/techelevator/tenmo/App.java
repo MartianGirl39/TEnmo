@@ -1,10 +1,7 @@
 package com.techelevator.tenmo;
 
 import com.techelevator.exceptions.InsufficientFunds;
-import com.techelevator.tenmo.model.Account;
-import com.techelevator.tenmo.model.AuthenticatedUser;
-import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.UserCredentials;
+import com.techelevator.tenmo.model.*;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
 import com.techelevator.tenmo.services.TenmoService;
@@ -119,9 +116,8 @@ public class App {
         boolean isValid = false;
         while(!isValid){
             String option = consoleService.promptForString("Enter transaction id to change or hit x to exit");
-            if(option == "x"){
-                isValid = true;
-                continue;
+            if(option.equals("x")){
+                return;
             }
             int transactionIdToChange = 0;
             try {
@@ -140,17 +136,17 @@ public class App {
         isValid = false;
         while(!isValid){
             int option = consoleService.promptForInt("Press 1 to approve \nPress 2 to reject");
+            TransferStatusDto updated = new TransferStatusDto();
+            updated.setId(transfer.getTransfer_id());
+            updated.setSendingAccount(transfer.getAccount_from());
             if (option == 1){
-                Transfer updated = transfer;
-                updated.setTransfer_status_id(2);
+                updated.setStatus("Approved");
                 tenmoService.changeTransferStatus(updated);
                 break;
             }
             else if (option == 2){
-                Transfer updated = transfer;
-                updated.setTransfer_status_id(3);
+                updated.setStatus("Rejected");
                 tenmoService.changeTransferStatus(updated);
-                break;
             }
             else {
                 System.out.println("Please enter a valid option");
@@ -175,11 +171,10 @@ public class App {
                 isValid = true;
             }
         }
-        BigDecimal amount = consoleService.promptForBigDecimal("Select the amount to give: ");
-        Transfer transfer = new Transfer();
-        transfer.setAccount_to(accountToReceiveMoney.getAccount_id());
-        transfer.setAmount(amount.doubleValue());
-        transfer.setAccount_from(tenmoService.getUserAccount().getAccount_id());
+        BigDecimal amount = consoleService.promptForBigDecimal("Select the amount to send: ");
+        TransferDto transfer = new TransferDto();
+        transfer.setAccount(accountToReceiveMoney.getAccount_id());
+        transfer.setAmount(amount.floatValue());
         try {
             tenmoService.sendTEBucksTo(transfer);
         }catch (InsufficientFunds e){
@@ -204,10 +199,9 @@ public class App {
             }
         }
         BigDecimal amount = consoleService.promptForBigDecimal("Select the amount to receive: ");
-        Transfer transfer = new Transfer();
-        transfer.setAccount_from(accountToReceiveMoney.getAccount_id());
+        TransferDto transfer = new TransferDto();
+        transfer.setAccount(accountToReceiveMoney.getAccount_id());
         transfer.setAmount(amount.doubleValue());
-        transfer.setAccount_to(tenmoService.getUserAccount().getAccount_id());
         tenmoService.requestTEBucksFrom(transfer);
     }
 

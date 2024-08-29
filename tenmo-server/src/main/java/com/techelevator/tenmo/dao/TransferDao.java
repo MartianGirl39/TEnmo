@@ -18,7 +18,7 @@ public class TransferDao {
     }
 
     public Transfer getTransferById(int id) {
-        Transfer transfer = new Transfer();
+        Transfer transfer = null;
         String sql = "Select * from transfer where transfer_id = ? ;";
 
         SqlRowSet result = jdbcTemplate.queryForRowSet(sql, id);
@@ -81,9 +81,9 @@ public class TransferDao {
         return id;
     }
 
-    public void updateTransactionStatus(Transfer transfer) {
+    public void updateTransactionStatus(int id, int status_id) {
         String sql = "UPDATE transfer SET transfer_status_id = ? WHERE transfer_id = ?";
-        jdbcTemplate.update(sql, transfer.getTransfer_status_id(), transfer.getTransfer_id());
+        jdbcTemplate.update(sql, status_id, id);
     }
 
     private Transfer mapRowToTransfer(SqlRowSet rs) {
