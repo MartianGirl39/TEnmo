@@ -1,5 +1,6 @@
 package com.techelevator.tenmo;
 
+import com.techelevator.exceptions.InsufficientFunds;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.Transfer;
@@ -179,7 +180,11 @@ public class App {
         transfer.setAccount_to(accountToReceiveMoney.getAccount_id());
         transfer.setAmount(amount.doubleValue());
         transfer.setAccount_from(tenmoService.getUserAccount().getAccount_id());
-        tenmoService.sendTEBucksTo(transfer);
+        try {
+            tenmoService.sendTEBucksTo(transfer);
+        }catch (InsufficientFunds e){
+            System.out.println(e.getMessage());
+        }
     }
 
     private void requestBucks() {

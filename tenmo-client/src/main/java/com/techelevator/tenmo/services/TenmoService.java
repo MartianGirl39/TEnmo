@@ -1,11 +1,14 @@
 package com.techelevator.tenmo.services;
 
+import com.techelevator.exceptions.InsufficientFunds;
+import com.techelevator.exceptions.TenmoRequestException;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.channels.AcceptPendingException;
@@ -69,8 +72,12 @@ public class TenmoService {
     }
 
     // TODO: make this with a transfer dto
-    public void sendTEBucksTo(Transfer transfer){
-        restTemplate.exchange(API_BASE_URL + "account/transfers/send", HttpMethod.POST, makeTransferEntity(transfer), Void.class);
+    public void sendTEBucksTo(Transfer transfer)throws TenmoRequestException {
+        try {
+            restTemplate.exchange(API_BASE_URL + "account/transfers/send", HttpMethod.POST, makeTransferEntity(transfer), Void.class);
+        }catch (HttpClientErrorException e){
+            throw new InsufficientFunds("Insufficient Funds", e.getStatusCode().value());
+        }
     }
 
     public void requestTEBucksFrom(Transfer transfer){
