@@ -1,13 +1,11 @@
 package com.techelevator.tenmo.controller;
 
-import com.techelevator.tenmo.dao.AccountDao;
-import com.techelevator.tenmo.dao.TransferDao;
-import com.techelevator.tenmo.dao.TransferStatusDao;
-import com.techelevator.tenmo.dao.UserDao;
+import com.techelevator.tenmo.dao.*;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.TransferStatus;
 import com.techelevator.tenmo.model.User;
+import com.techelevator.tenmo.model.dto.ClientTransferDto;
 import com.techelevator.tenmo.model.dto.TransferDto;
 import com.techelevator.tenmo.model.dto.TransferStatusDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +22,8 @@ import java.util.List;
 @PreAuthorize("isAuthenticated()")
 public class AccountController {
 
+    @Autowired
+    private TransferTypeDao transferTypeDao;
     @Autowired
     private TransferStatusDao transferStatusDao;
     @Autowired
@@ -104,7 +104,8 @@ public class AccountController {
         if(account == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        return transferDao.getTransferByUser(account.getAccount_id());
+        List<Transfer> transfers = transferDao.getTransferByUser(account.getAccount_id());
+        return transfers;
     }
 
     @RequestMapping(path = "/transfer/{id}", method = RequestMethod.GET)
@@ -190,5 +191,15 @@ public class AccountController {
         TransferStatus status = transferStatusDao.getStatusByName(type);
         Account account = accountDao.getAccountByUserId(user.getId());
         return transferDao.getTransfersByType(account.getAccount_id(), status.getTransfer_status_desc());
+    }
+
+    @RequestMapping(path="/transfer/status/{id}", method=RequestMethod.GET)
+    public String getStatusById(@PathVariable int id){
+        return transferStatusDao.getStatusById(id).getTransfer_status_desc();
+    }
+
+    @RequestMapping(path="transfer/type/{id}", method=RequestMethod.GET)
+    public String getTypeById(@PathVariable int id){
+        return transferTypeDao.getTypeById(id).getTransfer_type_desc();
     }
 }
