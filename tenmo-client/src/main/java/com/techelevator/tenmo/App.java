@@ -25,7 +25,7 @@ public class App {
 
     private void run() {
 
-        String TEnmo = consoleService.readAsciiArtFromFile("C:/Users/Student/workspace/java-blue-module2capstone-team6/tenmo-client/src/main/resources/banner.txt");
+        String TEnmo = consoleService.readAsciiArtFromFile("C://Users//Student//workspace//java-blue-module2capstone-team6//tenmo-client//src//main//resources//banners//banner.txt/");
         System.out.println(TEnmo);
 
         loginMenu();
@@ -94,16 +94,33 @@ public class App {
     }
 
     private void viewCurrentBalance() {
-        System.out.println(tenmoService.getAccountBalance());
+        String balanceBanner = consoleService.readAsciiArtFromFile("C://Users//Student//workspace//java-blue-module2capstone-team6//tenmo-client//src//main//resources//banners//Balance.txt/");
+        System.out.println(balanceBanner + "\n");
+
+        double balance = tenmoService.getAccountBalance();
+        if (balance <= 50) {
+            String sadFace = consoleService.readAsciiArtFromFile("C:/Users/" +
+                    "Student/workspace/java-blue-module2capstone-team6/tenmo-client/src/main/resources/banners/sad.txt");
+            System.out.print(sadFace + "  $");
+            System.out.print(balance + "\n");
+            System.out.println("___________________________");
+        } else {
+            String happyFace = consoleService.readAsciiArtFromFile("C:/Users/Student/workspace/java-blue-module2capstone-team6/tenmo-client/src/main/resources/banners/happy.txt");
+            System.out.print(happyFace + "  $");
+            System.out.print(balance + "\n");
+            System.out.println("___________________________");
+        }
+
+
     }
 
     private void viewTransferHistory() {
         Transfer[] pastTransfers = tenmoService.getTransferByUser();
         System.out.println("__________________________________");
         for (Transfer transfer : pastTransfers) {
-            System.out.println(tenmoService.getTypeById ( transfer.getTransfer_type_id() ) );
-            System.out.println(tenmoService.getStatusById ( transfer.getTransfer_status_id() ) );
-            System.out.println(transfer.getAmount() );
+            System.out.println(tenmoService.getTypeById(transfer.getTransfer_type_id()));
+            System.out.println(tenmoService.getStatusById(transfer.getTransfer_status_id()));
+            System.out.println(transfer.getAmount());
             System.out.println(transfer.getAccount_to());
             System.out.println(transfer.getAccount_from());
 
