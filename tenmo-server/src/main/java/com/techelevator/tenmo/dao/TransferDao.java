@@ -2,6 +2,9 @@ package com.techelevator.tenmo.dao;
 
 
 import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.User;
+import com.techelevator.tenmo.model.dto.ClientTransferDto;
+import com.techelevator.tenmo.model.dto.UserDto;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
@@ -86,6 +89,92 @@ public class TransferDao {
         jdbcTemplate.update(sql, status_id, id);
     }
 
+    public List<ClientTransferDto> getTransfers(int account_id){
+        List<ClientTransferDto> transfers = new ArrayList<>();
+
+        String sql = "SELECT " +
+                "transfer.transfer_id, " +
+                "transfer.account_to, " +
+                "transfer.account_from, " +
+                "transfer.amount, " +
+                "transfer_status.transfer_status_desc, " +
+                "transfer_type.transfer_type_desc, " +
+                "user_to.username AS to, " +
+                "user_from.username AS from " +
+                "FROM transfer " +
+                "JOIN  account AS account_from ON transfer.account_from = account_from.account_id " +
+                "JOIN account AS account_to ON transfer.account_to = account_to.account_id " +
+                "JOIN tenmo_user AS user_from ON account_from.user_id = user_from.user_id " +
+                "JOIN tenmo_user AS user_to ON account_to.user_id = user_to.user_id " +
+                "JOIN transfer_status ON transfer_status.transfer_status_id = transfer.transfer_status_id " +
+                "JOIN transfer_type ON transfer_type.transfer_type_id = transfer.transfer_type_id " +
+                "WHERE transfer.account_from = ? OR transfer.account_to = ?; ";
+
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, account_id, account_id);
+
+        while(results.next()){
+            transfers.add(mapRowToClientTransferObject(results));
+        }
+
+        return transfers;
+    }
+
+    public List<ClientTransferDto> getTransfersByStatus(int account_id){
+        List<ClientTransferDto> transfers = new ArrayList<>();
+
+        String sql = "SELECT " +
+                "transfer.transfer_id, " +
+                "transfer.account_to, " +
+                "transfer.account_from, " +
+                "transfer.amount, " +
+                "transfer_status.transfer_status_desc, " +
+                "transfer_type.transfer_type_desc, " +
+                "user_to.username AS to, " +
+                "user_from.username AS from " +
+                "FROM transfer " +
+                "JOIN  account AS account_from ON transfer.account_from = account_from.account_id " +
+                "JOIN account AS account_to ON transfer.account_to = account_to.account_id " +
+                "JOIN tenmo_user AS user_from ON account_from.user_id = user_from.user_id " +
+                "JOIN tenmo_user AS user_to ON account_to.user_id = user_to.user_id " +
+                "JOIN transfer_status ON transfer_status.transfer_status_id = transfer.transfer_status_id " +
+                "JOIN transfer_type ON transfer_type.transfer_type_id = transfer.transfer_type_id " +
+                "WHERE (transfer.account_from = ? OR transfer.account_to = ?) AND transfer_status.transfer_status_desc = 'Pending';";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, account_id, account_id);
+
+        while(results.next()){
+            transfers.add(mapRowToClientTransferObject(results));
+        }
+
+        return transfers;
+    }
+
+    public ClientTransferDto getTransferById2(int account_id){
+        String sql = "SELECT " +
+                "transfer.transfer_id, " +
+                "transfer.account_to, " +
+                "transfer.account_from, " +
+                "transfer.amount, " +
+                "transfer_status.transfer_status_desc, " +
+                "transfer_type.transfer_type_desc, " +
+                "user_to.username AS to, " +
+                "user_from.username AS from " +
+                "FROM transfer " +
+                "JOIN  account AS account_from ON transfer.account_from = account_from.account_id " +
+                "JOIN account AS account_to ON transfer.account_to = account_to.account_id " +
+                "JOIN tenmo_user AS user_from ON account_from.user_id = user_from.user_id " +
+                "JOIN tenmo_user AS user_to ON account_to.user_id = user_to.user_id " +
+                "JOIN transfer_status ON transfer_status.transfer_status_id = transfer.transfer_status_id " +
+                "JOIN transfer_type ON transfer_type.transfer_type_id = transfer.transfer_type_id " +
+                "WHERE transfer.transfer_id = ? ";
+
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, account_id);
+
+        if(results.next()){
+            return mapRowToClientTransferObject(results);
+        }
+        return null;
+    }
+
     private Transfer mapRowToTransfer(SqlRowSet rs) {
         Transfer Transfer = new Transfer();
         Transfer.setTransfer_id(rs.getInt("transfer_id"));
@@ -95,5 +184,23 @@ public class TransferDao {
         Transfer.setAccount_to(rs.getInt("account_to"));
         Transfer.setAmount(rs.getDouble("amount"));
         return Transfer;
+    }
+
+    private ClientTransferDto mapRowToClientTransferObject(SqlRowSet rs) {
+        ClientTransferDto clientTransferDto = new ClientTransferDto();
+        UserDto sender = new UserDto();
+        UserDto receiver = new UserDto();
+
+        clientTransferDto.setTransfer_id(rs.getInt("transfer_id"));
+        clientTransferDto.setAmount(rs.getDouble("amount"));
+        clientTransferDto.setStatus(rs.getString("transfer_status_desc"));
+        clientTransferDto.setType(rs.getString("transfer_type_desc"));
+        sender.setAccount_id(rs.getInt("account_from"));
+        sender.setUsername(rs.getString("from"));
+        clientTransferDto.setSender(sender);
+        receiver.setAccount_id(rs.getInt("account_to"));
+        receiver.setUsername(rs.getString("to"));
+        clientTransferDto.setReceiver(receiver);
+        return clientTransferDto;
     }
 }
