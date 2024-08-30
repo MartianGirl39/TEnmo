@@ -13,9 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.nio.channels.AcceptPendingException;
-import java.util.List;
-
 public class TenmoService {
     private final String API_BASE_URL = "http://localhost:8080/";
     private final RestTemplate restTemplate = new RestTemplate();
@@ -46,7 +43,7 @@ public class TenmoService {
         return new HttpEntity<>(transfer, headers);
     }
 
-    private HttpEntity<TransferStatusDto> makeTransferStatusDtoEntity(TransferStatusDto transferStatusDto){
+    private HttpEntity<TransferStatusDto> makeTransferStatusDtoEntity(TransferStatusDto transferStatusDto) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(token);
@@ -63,11 +60,11 @@ public class TenmoService {
         return balance;
     }
 
-    public Account[] getAccounts(){
+    public Account[] getAccounts() {
         return restTemplate.exchange(API_BASE_URL + "accounts", HttpMethod.GET, getAuthHeaders(), Account[].class).getBody();
     }
 
-    public Account getAccountById(int id){
+    public Account getAccountById(int id) {
         return restTemplate.exchange(API_BASE_URL + "account/" + id, HttpMethod.GET, getAuthHeaders(), Account.class).getBody();
     }
 
@@ -88,20 +85,31 @@ public class TenmoService {
     }
 
     // TODO: make this with a transfer dto
-    public void sendTEBucksTo(TransferDto transfer)throws TenmoRequestException {
+    public void sendTEBucksTo(TransferDto transfer) throws TenmoRequestException {
         try {
             restTemplate.exchange(API_BASE_URL + "account/transfers/send", HttpMethod.POST, makeTransferDtoEntity(transfer), Void.class);
-        }
-        catch (HttpClientErrorException e){
+        } catch (HttpClientErrorException e) {
             throw new InsufficientFunds("Insufficient Funds", e.getStatusCode().value());
         }
     }
 
-    public void requestTEBucksFrom(TransferDto transfer){
+    public void requestTEBucksFrom(TransferDto transfer) {
         restTemplate.exchange(API_BASE_URL + "account/transfers/request", HttpMethod.POST, makeTransferDtoEntity(transfer), Void.class);
     }
 
-    public void changeTransferStatus(TransferStatusDto transfer){
+    public void changeTransferStatus(TransferStatusDto transfer) {
         restTemplate.exchange(API_BASE_URL + "account/transfer", HttpMethod.PUT, makeTransferStatusDtoEntity(transfer), Void.class);
+    }
+
+    public String getStatusById(int id) {
+        HttpEntity entity = getAuthHeaders();
+        String status = restTemplate.exchange(API_BASE_URL + "transfer/status/" + id, HttpMethod.GET, entity, String.class).getBody();
+        return status;
+    }
+
+    public String getTypeById(int id) {
+        HttpEntity entity = getAuthHeaders();
+        String type = restTemplate.exchange(API_BASE_URL + "transfer/type/" + id, HttpMethod.GET, entity, String.class).getBody();
+        return type;
     }
 }
