@@ -64,8 +64,7 @@ public class Transfer {
                 "\nTransfer Type: " + this.type +
                 "\nTransfer Status: " + this.status +
                 "\nTransfer Amount: " + this.amount +
-                "\nAccount To: " + this.receiver +
-                "\nAccount From: " + this.sender +
+                "\nSender " + this.sender + " sends money to " + this.receiver +
                 "\n__________________________________";
     }
 }

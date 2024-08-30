@@ -210,12 +210,16 @@ public class App {
             System.out.println("Select user to send TE bucks");
             System.out.println("__________________________________\n");
             Account[] accounts = tenmoService.getAccounts();
-            for (Account account : accounts) {
-                System.out.println(account);
+            for (int i=0; i<accounts.length; i++) {
+                System.out.println(i+1 + ") " + accounts[i]);
                 System.out.println("__________________________________");
             }
-            String input = consoleService.promptForString("Select user: ");
-            accountToReceiveMoney = tenmoService.getUserAccount(input);
+            int input = consoleService.promptForInt("Select user by index: ");
+            if(input > accounts.length || input < 1){
+                System.out.println("please enter a valid index");
+                continue;
+            }
+            accountToReceiveMoney = tenmoService.getUserAccount(accounts[input-1].getUsername());
             if (accountToReceiveMoney != null) {
                 isValid = true;
             }
@@ -238,12 +242,16 @@ public class App {
             System.out.println("Select user to request TE bucks from");
             System.out.println("__________________________________\n");
             Account[] accounts = tenmoService.getAccounts();
-            for (Account account : accounts) {
-                System.out.println(account);
+            for (int i=0; i<accounts.length; i++) {
+                System.out.println(i+1 + ") " + accounts[i]);
                 System.out.println("__________________________________");
             }
-            String input = consoleService.promptForString("Select user by account_id: ");
-            accountToReceiveMoney = tenmoService.getUserAccount(input);
+            int input = consoleService.promptForInt("Select user by index: ");
+            if(input > accounts.length || input < 1){
+                System.out.println("please enter a valid index");
+                continue;
+            }
+            accountToReceiveMoney = tenmoService.getUserAccount(accounts[input-1].getUsername());
             if (accountToReceiveMoney != null) {
                 isValid = true;
             }
@@ -254,5 +262,4 @@ public class App {
         transfer.setAmount(amount.doubleValue());
         tenmoService.requestTEBucksFrom(transfer);
     }
-
 }

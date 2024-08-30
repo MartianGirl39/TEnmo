@@ -50,10 +50,6 @@ public class TenmoService {
         return new HttpEntity<>(transferStatusDto, headers);
     }
 
-    public Account getUserAccount() {
-        return restTemplate.exchange(API_BASE_URL + "user/account", HttpMethod.GET, getAuthHeaders(), Account.class).getBody();
-    }
-
     public Account getUserAccount(String username) {
         return restTemplate.exchange(API_BASE_URL + "user/account?username=" + username, HttpMethod.GET, getAuthHeaders(), Account.class).getBody();
     }
@@ -66,10 +62,6 @@ public class TenmoService {
 
     public Account[] getAccounts() {
         return restTemplate.exchange(API_BASE_URL + "user/accounts", HttpMethod.GET, getAuthHeaders(), Account[].class).getBody();
-    }
-
-    public Account getAccountById(int id) {
-        return restTemplate.exchange(API_BASE_URL + "user/account/" + id, HttpMethod.GET, getAuthHeaders(), Account.class).getBody();
     }
 
     public Transfer[] getTransferByUser() {
@@ -88,7 +80,6 @@ public class TenmoService {
         return restTemplate.exchange(API_BASE_URL + "user/account/transfers/pending", HttpMethod.GET, entity, Transfer[].class).getBody();
     }
 
-
     public void sendTEBucksTo(TransferDto transfer) throws TenmoRequestException {
         try {
             restTemplate.exchange(API_BASE_URL + "account/transfers/send", HttpMethod.POST, makeTransferDtoEntity(transfer), Void.class);
@@ -103,17 +94,5 @@ public class TenmoService {
 
     public void changeTransferStatus(TransferStatusDto transfer) {
         restTemplate.exchange(API_BASE_URL + "account/transfer", HttpMethod.PUT, makeTransferStatusDtoEntity(transfer), Void.class);
-    }
-
-    public String getStatusById(int id) {
-        HttpEntity entity = getAuthHeaders();
-        String status = restTemplate.exchange(API_BASE_URL + "transfer/status/" + id, HttpMethod.GET, entity, String.class).getBody();
-        return status;
-    }
-
-    public String getTypeById(int id) {
-        HttpEntity entity = getAuthHeaders();
-        String type = restTemplate.exchange(API_BASE_URL + "transfer/type/" + id, HttpMethod.GET, entity, String.class).getBody();
-        return type;
     }
 }
