@@ -33,37 +33,6 @@ public class AccountController {
     @Autowired
     private TransferDao transferDao;
 
-    // fetches account of the user who sends in the request via the principal
-    @RequestMapping(path = "/account", method = RequestMethod.GET)
-    public Account getAccount(Principal principal) {
-        // fetch user
-        User user = userDao.getUserByUsername(principal.getName());
-        if(user == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        // fetch account
-        Account account = accountDao.getAccountByUserId(user.getId());
-        // if there is no account on the database that matches the principal
-        if(account == null){
-            // throw some kind of 400 error
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        // return the account that was fetched
-        return account;
-    }
-
-    @RequestMapping(path="/account/{id}", method=RequestMethod.GET)
-    public Account getAccountById(@PathVariable int id){
-        // fetch the account
-        Account account = accountDao.getAccountById(id);
-        // if the account is not found in the database
-        if(account == null){
-            // throw a 404 error
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        return account;
-    }
-
     @RequestMapping(path = "/account/balance", method = RequestMethod.GET)
     public double getAccountBalance(Principal principal) {
         // fetching user from the principal
@@ -76,45 +45,6 @@ public class AccountController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         return account.getBalance();
-    }
-
-    @RequestMapping(path="/accounts", method=RequestMethod.GET)
-    public List<Account> getAccounts(Principal principal) {
-        User user = userDao.getUserByUsername(principal.getName());
-        if(user == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-        }
-        // fetch account
-        Account account = accountDao.getAccountByUserId(user.getId());
-        // if there is no account on the database that matches the principal
-        if(account == null){
-            // throw some kind of 400 error
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found");
-        }
-        return accountDao.listUser(account.getAccount_id());
-    }
-
-    @RequestMapping(path = "/account/transfers", method = RequestMethod.GET)
-    public List<Transfer> getTransferByUser(Principal principal) {
-        User user = userDao.getUserByUsername(principal.getName());
-        if(user == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        Account account = accountDao.getAccountByUserId(user.getId());
-        if(account == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        List<Transfer> transfers = transferDao.getTransferByUser(account.getAccount_id());
-        return transfers;
-    }
-
-    @RequestMapping(path = "/transfer/{id}", method = RequestMethod.GET)
-    public Transfer getTransferById(@PathVariable int id) {
-        Transfer transfer = transferDao.getTransferById(id);
-        if(transfer == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        return transfer;
     }
 
     // sends a transfers
@@ -184,28 +114,6 @@ public class AccountController {
             accountDao.transferBalance(fullTransfer.getAccount_from(), fullTransfer.getAccount_to(), fullTransfer.getAmount());
         }
     }
-
-    @RequestMapping(path = "/account/transfer/{type}", method = RequestMethod.GET)
-    public List<Transfer> viewPending(@PathVariable String type, Principal principal) {
-        User user = userDao.getUserByUsername(principal.getName());
-        TransferStatus status = transferStatusDao.getStatusByName(type);
-        Account account = accountDao.getAccountByUserId(user.getId());
-        return transferDao.getTransfersByType(account.getAccount_id(), status.getTransfer_status_desc());
-    }
-
-    @RequestMapping(path="/transfer/status/{id}", method=RequestMethod.GET)
-    public String getStatusById(@PathVariable int id){
-        return transferStatusDao.getStatusById(id).getTransfer_status_desc();
-    }
-
-    @RequestMapping(path="/transfer/type/{id}", method=RequestMethod.GET)
-    public String getTypeById(@PathVariable int id){
-        return transferTypeDao.getTypeById(id).getTransfer_type_desc();
-    }
-
-
-
-    // TODO: start of the client friendly DTO crap
 
     @RequestMapping(path="/user/account", method=RequestMethod.GET)
     public AccountDto getUserAccount(@RequestParam(required = false) String username, Principal principal){

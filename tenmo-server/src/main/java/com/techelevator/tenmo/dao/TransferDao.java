@@ -109,7 +109,8 @@ public class TransferDao {
                 "JOIN tenmo_user AS user_to ON account_to.user_id = user_to.user_id " +
                 "JOIN transfer_status ON transfer_status.transfer_status_id = transfer.transfer_status_id " +
                 "JOIN transfer_type ON transfer_type.transfer_type_id = transfer.transfer_type_id " +
-                "WHERE transfer.account_from = ? OR transfer.account_to = ?; ";
+                "WHERE transfer.account_from = ? OR transfer.account_to = ?" +
+                "ORDER BY transfer.transfer_id;";
 
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, account_id, account_id);
 
@@ -139,7 +140,8 @@ public class TransferDao {
                 "JOIN tenmo_user AS user_to ON account_to.user_id = user_to.user_id " +
                 "JOIN transfer_status ON transfer_status.transfer_status_id = transfer.transfer_status_id " +
                 "JOIN transfer_type ON transfer_type.transfer_type_id = transfer.transfer_type_id " +
-                "WHERE (transfer.account_from = ? OR transfer.account_to = ?) AND transfer_status.transfer_status_desc = 'Pending';";
+                "WHERE (transfer.account_from = ? OR transfer.account_to = ?) AND transfer_status.transfer_status_desc = 'Pending'" +
+                "ORDER BY transfer.transfer_id DESC";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, account_id, account_id);
 
         while(results.next()){
