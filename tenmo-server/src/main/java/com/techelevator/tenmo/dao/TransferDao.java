@@ -2,7 +2,6 @@ package com.techelevator.tenmo.dao;
 
 
 import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.dto.AccountDto;
 import com.techelevator.tenmo.model.dto.ClientTransferDto;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -49,10 +48,7 @@ public class TransferDao {
     public List<Transfer> getTransfersByType(int user_id, String status_id) {
         List<Transfer> transferTypeList = new ArrayList<>();
 
-        // SELECT * FROM transfer WHERE account_to = 2006 OR account_from = 2006 AND transfer_type_id = 1;
 
-//        String sql = "SELECT * FROM transfer WHERE account_to = ? OR account_from = ? AND transfer_type_id = ?";
-//
         String sql = "SELECT t.* FROM transfer t " +
                 "JOIN account a ON t.account_from = a.account_id OR t.account_to = a.account_id " +
                 "JOIN tenmo_user u ON a.user_id = u.user_id " +
@@ -70,18 +66,18 @@ public class TransferDao {
     }
 
 
-    public int sendTeBucks(int senderId, int receiverId, double amount) {
+    public int sendTeBucks(int senderId, int receiverId, double amount, String message) {
         int id = 0;
-        String sql = "insert into transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) values(2,2,?,?,?) returning transfer_id;";
+        String sql = "insert into transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount, message) values(2,2,?,?,?,? ) returning transfer_id;";
 
-        id = jdbcTemplate.queryForObject(sql, int.class, senderId, receiverId, amount);
+        id = jdbcTemplate.queryForObject(sql, int.class, senderId, receiverId, amount, message);
         return id;
     }
 
-    public int requestTeBucks(int senderId, int receiverId, double amount) {
+    public int requestTeBucks(int senderId, int receiverId, double amount, String message) {
         int id = 0;
-        String sql = "insert into transfer (transfer_type_id,transfer_status_id,account_from,account_to,amount) values(1,1,?,?,?) returning transfer_id;";
-        id = jdbcTemplate.queryForObject(sql, int.class, senderId, receiverId, amount);
+        String sql = "insert into transfer (transfer_type_id,transfer_status_id,account_from,account_to,amount, message) values(1,1,?,?,?,?) returning transfer_id;";
+        id = jdbcTemplate.queryForObject(sql, int.class, senderId, receiverId, amount, message);
         return id;
     }
 
@@ -90,7 +86,7 @@ public class TransferDao {
         jdbcTemplate.update(sql, status_id, id);
     }
 
-    public List<ClientTransferDto> getTransfers(int account_id){
+    public List<ClientTransferDto> getTransfers(int account_id) {
         List<ClientTransferDto> transfers = new ArrayList<>();
 
         String sql = "SELECT " +
@@ -98,6 +94,7 @@ public class TransferDao {
                 "transfer.account_to, " +
                 "transfer.account_from, " +
                 "transfer.amount, " +
+                "transfer.message, " +
                 "transfer_status.transfer_status_desc, " +
                 "transfer_type.transfer_type_desc, " +
                 "user_to.username AS to, " +
@@ -113,14 +110,14 @@ public class TransferDao {
 
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, account_id, account_id);
 
-        while(results.next()){
+        while (results.next()) {
             transfers.add(mapRowToClientTransferObject(results));
         }
 
         return transfers;
     }
 
-    public List<ClientTransferDto> getTransfersByStatus(int account_id){
+    public List<ClientTransferDto> getTransfersByStatus(int account_id) {
         List<ClientTransferDto> transfers = new ArrayList<>();
 
         String sql = "SELECT " +
@@ -128,6 +125,7 @@ public class TransferDao {
                 "transfer.account_to, " +
                 "transfer.account_from, " +
                 "transfer.amount, " +
+                "transfer.message, " +
                 "transfer_status.transfer_status_desc, " +
                 "transfer_type.transfer_type_desc, " +
                 "user_to.username AS to, " +
@@ -142,19 +140,20 @@ public class TransferDao {
                 "WHERE (transfer.account_from = ? OR transfer.account_to = ?) AND transfer_status.transfer_status_desc = 'Pending';";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, account_id, account_id);
 
-        while(results.next()){
+        while (results.next()) {
             transfers.add(mapRowToClientTransferObject(results));
         }
 
         return transfers;
     }
 
-    public ClientTransferDto getClientTransferById(int account_id){
+    public ClientTransferDto getClientTransferById(int account_id) {
         String sql = "SELECT " +
                 "transfer.transfer_id, " +
                 "transfer.account_to, " +
                 "transfer.account_from, " +
                 "transfer.amount, " +
+                "transfer.message, " +
                 "transfer_status.transfer_status_desc, " +
                 "transfer_type.transfer_type_desc, " +
                 "user_to.username AS to, " +
@@ -170,7 +169,7 @@ public class TransferDao {
 
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, account_id);
 
-        if(results.next()){
+        if (results.next()) {
             return mapRowToClientTransferObject(results);
         }
         return null;
@@ -184,6 +183,8 @@ public class TransferDao {
         Transfer.setAccount_from(rs.getInt("account_from"));
         Transfer.setAccount_to(rs.getInt("account_to"));
         Transfer.setAmount(rs.getDouble("amount"));
+        Transfer.setMessage(rs.getString("message"));
+
         return Transfer;
     }
 
@@ -202,6 +203,7 @@ public class TransferDao {
         receiver.setAccount_id(rs.getInt("account_to"));
         receiver.setUsername(rs.getString("to"));
         clientTransferDto.setReceiver(receiver);
+        clientTransferDto.setMessage("message");
         return clientTransferDto;
     }
 }

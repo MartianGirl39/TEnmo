@@ -135,7 +135,7 @@ public class AccountController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         // create a new transfer
-        transferDao.sendTeBucks(account.getAccount_id(), transfer.getAccount(), transfer.getAmount());
+        transferDao.sendTeBucks(account.getAccount_id(), transfer.getAccount(), transfer.getAmount(), transfer.getMessage());
         // adjust balances accordingly
         accountDao.transferBalance(account.getAccount_id(), transfer.getAccount(), transfer.getAmount());
     }
@@ -154,7 +154,7 @@ public class AccountController {
             // throw 403
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        transferDao.requestTeBucks(transfer.getAccount(), account.getAccount_id(), transfer.getAmount());
+        transferDao.requestTeBucks(transfer.getAccount(), account.getAccount_id(), transfer.getAmount(), transfer.getMessage());
     }
 
     @RequestMapping(path = "/account/transfer", method = RequestMethod.PUT)

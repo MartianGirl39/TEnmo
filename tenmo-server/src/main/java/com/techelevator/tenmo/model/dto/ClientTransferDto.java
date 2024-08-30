@@ -4,12 +4,21 @@ public class ClientTransferDto {
     private int transfer_id;
     private AccountDto sender;
     private AccountDto receiver;
-    String status;
-    String type;
-    double amount;
+    private String status;
+    private String type;
+    private double amount;
+    private String message;
 
     public int getTransfer_id() {
         return transfer_id;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public void setTransfer_id(int transfer_id) {

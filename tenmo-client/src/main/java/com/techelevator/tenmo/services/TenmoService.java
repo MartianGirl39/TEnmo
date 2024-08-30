@@ -88,7 +88,7 @@ public class TenmoService {
         return restTemplate.exchange(API_BASE_URL + "user/account/transfers/pending", HttpMethod.GET, entity, Transfer[].class).getBody();
     }
 
-    // TODO: make this with a transfer dto
+
     public void sendTEBucksTo(TransferDto transfer) throws TenmoRequestException {
         try {
             restTemplate.exchange(API_BASE_URL + "account/transfers/send", HttpMethod.POST, makeTransferDtoEntity(transfer), Void.class);
