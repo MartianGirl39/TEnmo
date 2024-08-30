@@ -5,10 +5,7 @@ import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.TransferStatus;
 import com.techelevator.tenmo.model.User;
-import com.techelevator.tenmo.model.dto.ClientTransferDto;
-import com.techelevator.tenmo.model.dto.TransferDto;
-import com.techelevator.tenmo.model.dto.TransferStatusDto;
-import com.techelevator.tenmo.model.dto.UserDto;
+import com.techelevator.tenmo.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.imageio.plugins.tiff.GeoTIFFTagSet;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -205,19 +203,31 @@ public class AccountController {
         return transferTypeDao.getTypeById(id).getTransfer_type_desc();
     }
 
-    @RequestMapping(path="/user/account/{id}", method=RequestMethod.GET)
-    public UserDto getUserById(@PathVariable int id){
-        UserDto userDto = new UserDto();
-        Account account = accountDao.getAccountById(id);
-        User user = userDao.getUserById(account.getUser_id());
-        userDto.setUsername(user.getUsername());
-        userDto.setAccount_id(account.getAccount_id());
-        return userDto;
-    }
+
+
+    // TODO: start of the client friendly DTO crap
 
     @RequestMapping(path="/user/account", method=RequestMethod.GET)
-    public List<UserDto> getUsers(Principal principal){
-        List<UserDto> userDtos = new ArrayList<>();
+    public UserAccountDto getUserAccount(Principal principal){
+        User user = userDao.getUserByUsername(principal.getName());
+        if(user == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        return accountDao.getUserAccountByUserId(user.getId());
+    }
+
+    @RequestMapping(path="/user/account/{id}", method=RequestMethod.GET)
+    public AccountDto getUserById(@PathVariable int id){
+        AccountDto account = accountDao.getAccountDtoById(id);
+        if(account == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        return account;
+    }
+
+    @RequestMapping(path="/user/accounts", method=RequestMethod.GET)
+    public List<AccountDto> getUsers(Principal principal){
+        List<AccountDto> userDtos = new ArrayList<>();
         User user = userDao.getUserByUsername(principal.getName());
         if(user == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -228,7 +238,7 @@ public class AccountController {
         }
         List<Account> accounts = accountDao.listUser(account.getAccount_id());
         for(Account acc : accounts){
-            UserDto newUser = new UserDto();
+            AccountDto newUser = new AccountDto();
             newUser.setAccount_id(acc.getAccount_id());
             newUser.setUsername(userDao.getUserById(acc.getUser_id()).getUsername());
             userDtos.add(newUser);
@@ -251,7 +261,7 @@ public class AccountController {
 
     @RequestMapping(path="/user/account/transfer/{id}", method=RequestMethod.GET)
     public ClientTransferDto getTransferById2(@PathVariable int id){
-        return transferDao.getTransferById2(id);
+        return transferDao.getClientTransferById(id);
     }
 
     @RequestMapping(path="/user/account/transfers/pending", method=RequestMethod.GET)

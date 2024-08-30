@@ -3,8 +3,8 @@ package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
+import com.techelevator.tenmo.model.dto.AccountDto;
 import com.techelevator.tenmo.model.dto.ClientTransferDto;
-import com.techelevator.tenmo.model.dto.UserDto;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
@@ -45,6 +45,7 @@ public class TransferDao {
 
     }
 
+    // git shows Jennifer+1, I started it and it failed. This is all Seth! He did awesome. I built upon his ideas and work for the ClientTransfer code :)
     public List<Transfer> getTransfersByType(int user_id, String status_id) {
         List<Transfer> transferTypeList = new ArrayList<>();
 
@@ -148,7 +149,7 @@ public class TransferDao {
         return transfers;
     }
 
-    public ClientTransferDto getTransferById2(int account_id){
+    public ClientTransferDto getClientTransferById(int account_id){
         String sql = "SELECT " +
                 "transfer.transfer_id, " +
                 "transfer.account_to, " +
@@ -188,8 +189,8 @@ public class TransferDao {
 
     private ClientTransferDto mapRowToClientTransferObject(SqlRowSet rs) {
         ClientTransferDto clientTransferDto = new ClientTransferDto();
-        UserDto sender = new UserDto();
-        UserDto receiver = new UserDto();
+        AccountDto sender = new AccountDto();
+        AccountDto receiver = new AccountDto();
 
         clientTransferDto.setTransfer_id(rs.getInt("transfer_id"));
         clientTransferDto.setAmount(rs.getDouble("amount"));
