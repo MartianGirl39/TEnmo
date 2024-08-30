@@ -3,29 +3,11 @@ package com.techelevator.tenmo.model;
 public class Transfer {
 
     private int transfer_id;
-
-    private int transfer_type_id;
-
-    private int transfer_status_id;
-
-    private int account_from;
-
-    private int account_to;
-
-    private double amount;
-
-    public Transfer() {
-
-    }
-
-    public Transfer(int transfer_id, int transfer_type_id, int transfer_status_id, int account_from, int account_to, double amount) {
-        this.transfer_id = transfer_id;
-        this.transfer_type_id = transfer_type_id;
-        this.transfer_status_id = transfer_status_id;
-        this.account_from = account_from;
-        this.account_to = account_to;
-        this.amount = amount;
-    }
+    private Account sender;
+    private Account receiver;
+    String status;
+    String type;
+    double amount;
 
     public int getTransfer_id() {
         return transfer_id;
@@ -35,36 +17,36 @@ public class Transfer {
         this.transfer_id = transfer_id;
     }
 
-    public int getTransfer_type_id() {
-        return transfer_type_id;
+    public Account getSender() {
+        return sender;
     }
 
-    public void setTransfer_type_id(int transfer_type_id) {
-        this.transfer_type_id = transfer_type_id;
+    public void setSender(Account sender) {
+        this.sender = sender;
     }
 
-    public int getTransfer_status_id() {
-        return transfer_status_id;
+    public Account getReceiver() {
+        return receiver;
     }
 
-    public void setTransfer_status_id(int transfer_status_id) {
-        this.transfer_status_id = transfer_status_id;
+    public void setReceiver(Account receiver) {
+        this.receiver = receiver;
     }
 
-    public int getAccount_from() {
-        return account_from;
+    public String getStatus() {
+        return status;
     }
 
-    public void setAccount_from(int account_from) {
-        this.account_from = account_from;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
-    public int getAccount_to() {
-        return account_to;
+    public String getType() {
+        return type;
     }
 
-    public void setAccount_to(int account_to) {
-        this.account_to = account_to;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public double getAmount() {
@@ -77,13 +59,13 @@ public class Transfer {
 
     @Override
     public String toString() {
-        return "Transfer #: " + transfer_id + "\n" +
-                "\t| Transfer Type: " + transfer_type_id + "\n" +
-                "\t| Transfer Status: " + transfer_status_id + "\n" +
-                "\t| Account From: " + account_from + "\n" +
-                "\t| Account To: " + account_to + "\n" +
-                "\t| Transfer Amount: " + amount + "\n";
-
-
+        return "__________________________________" +
+                "\nTransfer Id: " + this.transfer_id +
+                "\nTransfer Type: " + this.type +
+                "\nTransfer Status: " + this.status +
+                "\nTransfer Amount: " + this.amount +
+                "\nAccount To: " + this.receiver +
+                "\nAccount From: " + this.sender +
+                "__________________________________\n";
     }
 }

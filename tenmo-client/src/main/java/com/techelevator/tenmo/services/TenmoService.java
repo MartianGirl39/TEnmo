@@ -4,8 +4,8 @@ import com.techelevator.exceptions.InsufficientFunds;
 import com.techelevator.exceptions.TenmoRequestException;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.TransferDto;
-import com.techelevator.tenmo.model.TransferStatusDto;
+import com.techelevator.tenmo.model.dto.TransferDto;
+import com.techelevator.tenmo.model.dto.TransferStatusDto;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -51,7 +51,11 @@ public class TenmoService {
     }
 
     public Account getUserAccount() {
-        return restTemplate.exchange(API_BASE_URL + "account", HttpMethod.GET, getAuthHeaders(), Account.class).getBody();
+        return restTemplate.exchange(API_BASE_URL + "user/account", HttpMethod.GET, getAuthHeaders(), Account.class).getBody();
+    }
+
+    public Account getUserAccount(String username) {
+        return restTemplate.exchange(API_BASE_URL + "user/account?username=" + username, HttpMethod.GET, getAuthHeaders(), Account.class).getBody();
     }
 
     public double getAccountBalance() {
@@ -61,27 +65,27 @@ public class TenmoService {
     }
 
     public Account[] getAccounts() {
-        return restTemplate.exchange(API_BASE_URL + "accounts", HttpMethod.GET, getAuthHeaders(), Account[].class).getBody();
+        return restTemplate.exchange(API_BASE_URL + "user/accounts", HttpMethod.GET, getAuthHeaders(), Account[].class).getBody();
     }
 
     public Account getAccountById(int id) {
-        return restTemplate.exchange(API_BASE_URL + "account/" + id, HttpMethod.GET, getAuthHeaders(), Account.class).getBody();
+        return restTemplate.exchange(API_BASE_URL + "user/account/" + id, HttpMethod.GET, getAuthHeaders(), Account.class).getBody();
     }
 
     public Transfer[] getTransferByUser() {
         HttpEntity entity = getAuthHeaders();
-        return restTemplate.exchange(API_BASE_URL + "account/transfers", HttpMethod.GET, entity, Transfer[].class).getBody();
+        return restTemplate.exchange(API_BASE_URL + "user/account/transfers", HttpMethod.GET, entity, Transfer[].class).getBody();
     }
 
     public Transfer getTransferById(int id) {
         HttpEntity entity = getAuthHeaders();
-        Transfer transfer = restTemplate.exchange(API_BASE_URL + "transfer/" + id, HttpMethod.GET, entity, Transfer.class).getBody();
+        Transfer transfer = restTemplate.exchange(API_BASE_URL + "user/account/transfer/" + id, HttpMethod.GET, entity, Transfer.class).getBody();
         return transfer;
     }
 
-    public Transfer[] viewPending(String type) {
+    public Transfer[] viewPending() {
         HttpEntity entity = getAuthHeaders();
-        return restTemplate.exchange(API_BASE_URL + "/account/transfer/" + type, HttpMethod.GET, entity, Transfer[].class).getBody();
+        return restTemplate.exchange(API_BASE_URL + "user/account/transfers/pending", HttpMethod.GET, entity, Transfer[].class).getBody();
     }
 
     // TODO: make this with a transfer dto

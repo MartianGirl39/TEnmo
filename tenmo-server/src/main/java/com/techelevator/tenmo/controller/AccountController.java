@@ -208,12 +208,19 @@ public class AccountController {
     // TODO: start of the client friendly DTO crap
 
     @RequestMapping(path="/user/account", method=RequestMethod.GET)
-    public UserAccountDto getUserAccount(Principal principal){
-        User user = userDao.getUserByUsername(principal.getName());
-        if(user == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    public AccountDto getUserAccount(@RequestParam(required = false) String username, Principal principal){
+        User user = null;
+        if(username == null) {
+            user = userDao.getUserByUsername(principal.getName());
+            if(user == null){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            }
+            return accountDao.getUserAccountByUserId(user.getId());
         }
-        return accountDao.getUserAccountByUserId(user.getId());
+        else {
+            System.out.println(username);
+            return accountDao.getAccountDtoByUsername(username);
+        }
     }
 
     @RequestMapping(path="/user/account/{id}", method=RequestMethod.GET)

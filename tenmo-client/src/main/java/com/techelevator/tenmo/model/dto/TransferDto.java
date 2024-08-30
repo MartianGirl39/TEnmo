@@ -1,4 +1,4 @@
-package com.techelevator.tenmo.model;
+package com.techelevator.tenmo.model.dto;
 
 public class TransferDto {
     int account;

@@ -2,6 +2,8 @@ package com.techelevator.tenmo;
 
 import com.techelevator.exceptions.InsufficientFunds;
 import com.techelevator.tenmo.model.*;
+import com.techelevator.tenmo.model.dto.TransferDto;
+import com.techelevator.tenmo.model.dto.TransferStatusDto;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
 import com.techelevator.tenmo.services.TenmoService;
@@ -117,15 +119,7 @@ public class App {
         Transfer[] pastTransfers = tenmoService.getTransferByUser();
         System.out.println("__________________________________");
         for (Transfer transfer : pastTransfers) {
-            System.out.println("__________________________________");
-            System.out.println("Transfer Type: " + tenmoService.getTypeById(transfer.getTransfer_type_id()));
-            System.out.println("Transfer Status: " + tenmoService.getStatusById(transfer.getTransfer_status_id()));
-            System.out.println("Transfer Amount: " + transfer.getAmount());
-            System.out.println("Account To: " + transfer.getAccount_to());
-            System.out.println("Account From: " + transfer.getAccount_from());
-            System.out.println("__________________________________");
-
-
+            System.out.println(transfer);
         }
         System.out.println("__________________________________");
 
@@ -134,12 +128,10 @@ public class App {
     private void viewPendingRequests() {
         boolean stay = true;
         while (stay) {
-            Transfer[] pending = tenmoService.viewPending("Pending");
+            Transfer[] pending = tenmoService.viewPending();
             if (pending.length == 0) {
                 System.out.println("You are all caught up!");
                 return;
-
-
             }
             System.out.println(pending.length);
             for (Transfer transfer : pending) {
@@ -173,7 +165,7 @@ public class App {
             int option = consoleService.promptForInt("Press 1 to approve \nPress 2 to reject: ");
             TransferStatusDto updated = new TransferStatusDto();
             updated.setId(transfer.getTransfer_id());
-            updated.setSendingAccount(transfer.getAccount_from());
+            updated.setSendingAccount(transfer.getSender().getAccount_id());
             if (option == 1) {
                 updated.setStatus("Approved");
                 tenmoService.changeTransferStatus(updated);
@@ -199,8 +191,8 @@ public class App {
                 System.out.println(account);
                 System.out.println("__________________________________");
             }
-            int input = consoleService.promptForInt("Select user by account_id: ");
-            accountToReceiveMoney = tenmoService.getAccountById(input);
+            String input = consoleService.promptForString("Select user: ");
+            accountToReceiveMoney = tenmoService.getUserAccount(input);
             if (accountToReceiveMoney != null) {
                 isValid = true;
             }
@@ -227,8 +219,8 @@ public class App {
                 System.out.println(account);
                 System.out.println("__________________________________");
             }
-            int input = consoleService.promptForInt("Select user by account_id: ");
-            accountToReceiveMoney = tenmoService.getAccountById(input);
+            String input = consoleService.promptForString("Select user by account_id: ");
+            accountToReceiveMoney = tenmoService.getUserAccount(input);
             if (accountToReceiveMoney != null) {
                 isValid = true;
             }

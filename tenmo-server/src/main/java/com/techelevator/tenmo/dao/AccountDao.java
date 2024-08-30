@@ -116,6 +116,18 @@ public class AccountDao {
         return account;
     }
 
+    public AccountDto getAccountDtoByUsername(String username){
+        AccountDto account = null;
+
+        String sql = "SELECT account.account_id, tenmo_user.username FROM account JOIN tenmo_user ON tenmo_user.user_id = account.user_id WHERE username = ?";
+
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, username);
+        if(results.next()){
+            account = mapRowToAccountDto(results);
+        }
+        return account;
+    }
+
     public List<AccountDto> getAccount(int userAccount){
         List<AccountDto> account = new ArrayList<>();
         // select every account from account
