@@ -228,6 +228,8 @@ public class App {
         TransferDto transfer = new TransferDto();
         transfer.setAccount(accountToReceiveMoney.getAccount_id());
         transfer.setAmount(amount.floatValue());
+        String message = consoleService.promptForString("What's this for?: ");
+        transfer.setMessage(message);
         try {
             tenmoService.sendTEBucksTo(transfer);
         } catch (InsufficientFunds e) {
@@ -260,6 +262,8 @@ public class App {
         TransferDto transfer = new TransferDto();
         transfer.setAccount(accountToReceiveMoney.getAccount_id());
         transfer.setAmount(amount.doubleValue());
+        String message = consoleService.promptForString("What's this for?: ");
+        transfer.setMessage(message);
         tenmoService.requestTEBucksFrom(transfer);
     }
 }

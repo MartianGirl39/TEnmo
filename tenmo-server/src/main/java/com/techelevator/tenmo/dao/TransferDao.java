@@ -205,7 +205,7 @@ public class TransferDao {
         receiver.setAccount_id(rs.getInt("account_to"));
         receiver.setUsername(rs.getString("to"));
         clientTransferDto.setReceiver(receiver);
-        clientTransferDto.setMessage("message");
+        clientTransferDto.setMessage(rs.getString("message"));
         return clientTransferDto;
     }
 }

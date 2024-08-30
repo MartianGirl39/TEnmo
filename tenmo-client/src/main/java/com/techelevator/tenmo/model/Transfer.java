@@ -5,9 +5,18 @@ public class Transfer {
     private int transfer_id;
     private Account sender;
     private Account receiver;
-    String status;
-    String type;
-    double amount;
+    private String status;
+    private String type;
+    private double amount;
+    private String message;
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
     public int getTransfer_id() {
         return transfer_id;
@@ -64,6 +73,7 @@ public class Transfer {
                 "\nTransfer Type: " + this.type +
                 "\nTransfer Status: " + this.status +
                 "\nTransfer Amount: " + this.amount +
+                "\nMessage: " + this.message +
                 "\nSender " + this.sender + " sends money to " + this.receiver +
                 "\n__________________________________";
     }

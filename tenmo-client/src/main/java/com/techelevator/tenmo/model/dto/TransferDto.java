@@ -1,8 +1,17 @@
 package com.techelevator.tenmo.model.dto;
 
 public class TransferDto {
-    int account;
-    double amount;
+    private int account;
+    private double amount;
+    private String message;
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
     public void setAccount(int account) {
         this.account = account;
