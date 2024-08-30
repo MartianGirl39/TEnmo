@@ -25,7 +25,7 @@ public class App {
 
     private void run() {
 
-        String TEnmo = consoleService.readAsciiArtFromFile("C://Users//Student//workspace//java-blue-module2capstone-team6//tenmo-client//src//main//resources//banners//banner.txt/");
+        String TEnmo = consoleService.readAsciiArtFromFile("src/main/resources/banners/banner.txt");
         System.out.println(TEnmo);
 
         loginMenu();
@@ -94,18 +94,17 @@ public class App {
     }
 
     private void viewCurrentBalance() {
-        String balanceBanner = consoleService.readAsciiArtFromFile("C://Users//Student//workspace//java-blue-module2capstone-team6//tenmo-client//src//main//resources//banners//Balance.txt/");
+        String balanceBanner = consoleService.readAsciiArtFromFile("src/main/resources/banners/Balance.txt");
         System.out.println(balanceBanner + "\n");
 
         double balance = tenmoService.getAccountBalance();
         if (balance <= 50) {
-            String sadFace = consoleService.readAsciiArtFromFile("C:/Users/" +
-                    "Student/workspace/java-blue-module2capstone-team6/tenmo-client/src/main/resources/banners/sad.txt");
+            String sadFace = consoleService.readAsciiArtFromFile("src/main/resources/banners/sad.txt");
             System.out.print(sadFace + "    $");
             System.out.print(balance + "\n");
             System.out.println("____________________________");
         } else {
-            String happyFace = consoleService.readAsciiArtFromFile("C:/Users/Student/workspace/java-blue-module2capstone-team6/tenmo-client/src/main/resources/banners/happy.txt");
+            String happyFace = consoleService.readAsciiArtFromFile("src/main/resources/banners/happy.txt");
             System.out.print(happyFace + "    $");
             System.out.print(balance + "\n");
             System.out.println("____________________________");
@@ -118,27 +117,35 @@ public class App {
         Transfer[] pastTransfers = tenmoService.getTransferByUser();
         System.out.println("__________________________________");
         for (Transfer transfer : pastTransfers) {
-            System.out.println(tenmoService.getTypeById(transfer.getTransfer_type_id()));
-            System.out.println(tenmoService.getStatusById(transfer.getTransfer_status_id()));
-            System.out.println(transfer.getAmount());
-            System.out.println(transfer.getAccount_to());
-            System.out.println(transfer.getAccount_from());
+            System.out.println("__________________________________");
+            System.out.println("Transfer Type: " + tenmoService.getTypeById(transfer.getTransfer_type_id()));
+            System.out.println("Transfer Status: " + tenmoService.getStatusById(transfer.getTransfer_status_id()));
+            System.out.println("Transfer Amount: " + transfer.getAmount());
+            System.out.println("Account To: " + transfer.getAccount_to());
+            System.out.println("Account From: " + transfer.getAccount_from());
+            System.out.println("__________________________________");
 
 
         }
-//            System.out.println("__________________________________\n");
-//            System.out.println(transfer);
-//            System.out.println("__________________________________");
-//        }
-//        System.out.println("__________________________________");
+        System.out.println("__________________________________");
 
     }
 
     private void viewPendingRequests() {
-        Transfer[] pending = tenmoService.viewPending("Pending");
-        System.out.println(pending.length);
-        for (Transfer transfer : pending) {
-            System.out.println(transfer);
+        boolean stay = true;
+        while (stay) {
+            Transfer[] pending = tenmoService.viewPending("Pending");
+            if (pending.length == 0) {
+                System.out.println("You are all caught up!");
+                return;
+
+
+            }
+            System.out.println(pending.length);
+            for (Transfer transfer : pending) {
+                System.out.println(transfer);
+            }
+            stay = false;
         }
 
         Transfer transfer = null;
@@ -163,7 +170,7 @@ public class App {
         }
         isValid = false;
         while (!isValid) {
-            int option = consoleService.promptForInt("Press 1 to approve \nPress 2 to reject");
+            int option = consoleService.promptForInt("Press 1 to approve \nPress 2 to reject: ");
             TransferStatusDto updated = new TransferStatusDto();
             updated.setId(transfer.getTransfer_id());
             updated.setSendingAccount(transfer.getAccount_from());
@@ -174,6 +181,7 @@ public class App {
             } else if (option == 2) {
                 updated.setStatus("Rejected");
                 tenmoService.changeTransferStatus(updated);
+                break;
             } else {
                 System.out.println("Please enter a valid option");
             }
