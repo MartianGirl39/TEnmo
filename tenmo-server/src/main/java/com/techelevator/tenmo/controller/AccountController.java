@@ -5,6 +5,7 @@ import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.TransferStatus;
 import com.techelevator.tenmo.model.User;
+import com.techelevator.tenmo.model.dto.ClientTransferDto;
 import com.techelevator.tenmo.model.dto.TransferDto;
 import com.techelevator.tenmo.model.dto.TransferStatusDto;
 import com.techelevator.tenmo.model.dto.UserDto;
@@ -233,5 +234,36 @@ public class AccountController {
             userDtos.add(newUser);
         }
         return userDtos;
+    }
+
+    @RequestMapping(path="/user/account/transfers", method=RequestMethod.GET)
+    public List<ClientTransferDto> getAllTransfersForUser(Principal principal){
+        User user = userDao.getUserByUsername(principal.getName());
+        if(user == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        Account account = accountDao.getAccountByUserId(user.getId());
+        if(account == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        return transferDao.getTransfers(account.getAccount_id());
+    }
+
+    @RequestMapping(path="/user/account/transfer/{id}", method=RequestMethod.GET)
+    public ClientTransferDto getTransferById2(@PathVariable int id){
+        return transferDao.getTransferById2(id);
+    }
+
+    @RequestMapping(path="/user/account/transfers/pending", method=RequestMethod.GET)
+    public List<ClientTransferDto> getAllTransfersForUserByStatus(Principal principal){
+        User user = userDao.getUserByUsername(principal.getName());
+        if(user == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        Account account = accountDao.getAccountByUserId(user.getId());
+        if(account == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        return transferDao.getTransfersByStatus(account.getAccount_id());
     }
 }
