@@ -101,14 +101,14 @@ public class App {
         if (balance <= 50) {
             String sadFace = consoleService.readAsciiArtFromFile("C:/Users/" +
                     "Student/workspace/java-blue-module2capstone-team6/tenmo-client/src/main/resources/banners/sad.txt");
-            System.out.print(sadFace + "  $");
+            System.out.print(sadFace + "    $");
             System.out.print(balance + "\n");
-            System.out.println("___________________________");
+            System.out.println("____________________________");
         } else {
             String happyFace = consoleService.readAsciiArtFromFile("C:/Users/Student/workspace/java-blue-module2capstone-team6/tenmo-client/src/main/resources/banners/happy.txt");
-            System.out.print(happyFace + "  $");
+            System.out.print(happyFace + "    $");
             System.out.print(balance + "\n");
-            System.out.println("___________________________");
+            System.out.println("____________________________");
         }
 
 
