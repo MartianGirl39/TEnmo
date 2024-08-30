@@ -1,12 +1,17 @@
 package com.techelevator.tenmo;
 
 import com.techelevator.exceptions.InsufficientFunds;
-import com.techelevator.tenmo.model.*;
+import com.techelevator.exceptions.LoginFailureException;
+import com.techelevator.tenmo.model.Account;
+import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.model.dto.TransferDto;
 import com.techelevator.tenmo.model.dto.TransferStatusDto;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
 import com.techelevator.tenmo.services.TenmoService;
+import org.springframework.web.client.RestClientException;
 
 import java.math.BigDecimal;
 
@@ -42,9 +47,18 @@ public class App {
             consoleService.printLoginMenu();
             menuSelection = consoleService.promptForMenuSelection("Please choose an option: ");
             if (menuSelection == 1) {
-                handleRegister();
+                try {
+                    handleRegister();
+                } catch (LoginFailureException e) {
+                    System.out.println("\n" + e.getMessage());
+                }
             } else if (menuSelection == 2) {
-                handleLogin();
+                try {
+                    handleLogin();
+                } catch (LoginFailureException e) {
+                    System.out.println("\n" + e.getMessage());
+                }
+
             } else if (menuSelection != 0) {
                 System.out.println("Invalid Selection");
                 consoleService.pause();
@@ -58,17 +72,18 @@ public class App {
         if (authenticationService.register(credentials)) {
             System.out.println("Registration successful. You can now login.");
         } else {
-            consoleService.printErrorMessage();
+            throw new LoginFailureException("User already exists", 418);
         }
     }
 
     private void handleLogin() {
         UserCredentials credentials = consoleService.promptForCredentials();
         currentUser = authenticationService.login(credentials);
-        tenmoService.setToken(currentUser.getToken());
+
         if (currentUser == null) {
-            consoleService.printErrorMessage();
+            throw new LoginFailureException("Username or Password incorrect", 404);
         }
+        tenmoService.setToken(currentUser.getToken());
     }
 
     private void mainMenu() {
@@ -168,11 +183,19 @@ public class App {
             updated.setSendingAccount(transfer.getSender().getAccount_id());
             if (option == 1) {
                 updated.setStatus("Approved");
-                tenmoService.changeTransferStatus(updated);
+                try {
+                    tenmoService.changeTransferStatus(updated);
+                } catch (RestClientException e) {
+                    System.out.println("User cannot approve their own requests");
+                }
                 break;
             } else if (option == 2) {
                 updated.setStatus("Rejected");
-                tenmoService.changeTransferStatus(updated);
+                try {
+                    tenmoService.changeTransferStatus(updated);
+                } catch (RestClientException e) {
+                    System.out.println("User cannot Reject their own requests");
+                }
                 break;
             } else {
                 System.out.println("Please enter a valid option");

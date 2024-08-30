@@ -66,6 +66,6 @@ public class Transfer {
                 "\nTransfer Amount: " + this.amount +
                 "\nAccount To: " + this.receiver +
                 "\nAccount From: " + this.sender +
-                "__________________________________\n";
+                "\n__________________________________";
     }
 }
