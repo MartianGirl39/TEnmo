@@ -1,9 +1,11 @@
 package com.techelevator.tenmo.dao;
 
 
+import com.techelevator.tenmo.exception.DaoException;
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.dto.AccountDto;
 import com.techelevator.tenmo.model.dto.ClientTransferDto;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
@@ -23,22 +25,31 @@ public class TransferDao {
         Transfer transfer = null;
         String sql = "Select * from transfer where transfer_id = ? ;";
 
-        SqlRowSet result = jdbcTemplate.queryForRowSet(sql, id);
-
-        if (result.next()) {
-            transfer = mapRowToTransfer(result);
+        try {
+            SqlRowSet result = jdbcTemplate.queryForRowSet(sql, id);
+            if (result.next()) {
+                transfer = mapRowToTransfer(result);
+            }
+            return transfer;
         }
-        return transfer;
+        catch (DataAccessException err){
+            throw new DaoException();
+        }
     }
 
     public List<Transfer> getTransferByUser(int user_id) {
         List<Transfer> transfers = new ArrayList<>();
         String sql = " select * from transfer where account_from = ? OR account_to = ?;";
 
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, user_id, user_id);
+        try {
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, user_id, user_id);
 
-        while (results.next()) {
-            transfers.add(mapRowToTransfer(results));
+            while (results.next()) {
+                transfers.add(mapRowToTransfer(results));
+            }
+        }
+        catch (DataAccessException err){
+            throw new DaoException();
         }
         return transfers;
 
@@ -54,12 +65,16 @@ public class TransferDao {
                 "JOIN tenmo_user u ON a.user_id = u.user_id " +
                 "JOIN transfer_status ts ON t.transfer_status_id = ts.transfer_status_id " +
                 "WHERE account_id = ? AND ts.transfer_status_desc = ?";
+        try {
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, user_id, status_id);
 
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, user_id, status_id);
-
-        while (results.next()) {
-            Transfer transfer = mapRowToTransfer(results);
-            transferTypeList.add(transfer);
+            while (results.next()) {
+                Transfer transfer = mapRowToTransfer(results);
+                transferTypeList.add(transfer);
+            }
+        }
+        catch (DataAccessException err){
+            throw new DaoException();
         }
 
         return transferTypeList;
@@ -69,21 +84,35 @@ public class TransferDao {
     public int sendTeBucks(int senderId, int receiverId, double amount, String message) {
         int id = 0;
         String sql = "insert into transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount, message) values(2,2,?,?,?,? ) returning transfer_id;";
-
-        id = jdbcTemplate.queryForObject(sql, int.class, senderId, receiverId, amount, message);
+        try {
+            id = jdbcTemplate.queryForObject(sql, int.class, senderId, receiverId, amount, message);
+        }
+        catch (DataAccessException err){
+            throw new DaoException();
+        }
         return id;
     }
 
     public int requestTeBucks(int senderId, int receiverId, double amount, String message) {
         int id = 0;
         String sql = "insert into transfer (transfer_type_id,transfer_status_id,account_from,account_to,amount, message) values(1,1,?,?,?,?) returning transfer_id;";
-        id = jdbcTemplate.queryForObject(sql, int.class, senderId, receiverId, amount, message);
+        try {
+            id = jdbcTemplate.queryForObject(sql, int.class, senderId, receiverId, amount, message);
+        }
+        catch (DataAccessException err){
+            throw new DaoException();
+        }
         return id;
     }
 
     public void updateTransactionStatus(int id, int status_id) {
         String sql = "UPDATE transfer SET transfer_status_id = ? WHERE transfer_id = ?";
-        jdbcTemplate.update(sql, status_id, id);
+        try {
+            jdbcTemplate.update(sql, status_id, id);
+        }
+        catch (DataAccessException err){
+            throw new DaoException();
+        }
     }
 
     public List<ClientTransferDto> getTransfers(int account_id) {
@@ -108,13 +137,16 @@ public class TransferDao {
                 "JOIN transfer_type ON transfer_type.transfer_type_id = transfer.transfer_type_id " +
                 "WHERE transfer.account_from = ? OR transfer.account_to = ?" +
                 "ORDER BY transfer.transfer_id;";
+        try {
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, account_id, account_id);
 
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, account_id, account_id);
-
-        while (results.next()) {
-            transfers.add(mapRowToClientTransferObject(results));
+            while (results.next()) {
+                transfers.add(mapRowToClientTransferObject(results));
+            }
         }
-
+        catch (DataAccessException err){
+            throw new DaoException();
+        }
         return transfers;
     }
 
@@ -140,12 +172,16 @@ public class TransferDao {
                 "JOIN transfer_type ON transfer_type.transfer_type_id = transfer.transfer_type_id " +
                 "WHERE (transfer.account_from = ? OR transfer.account_to = ?) AND transfer_status.transfer_status_desc = 'Pending'" +
                 "ORDER BY transfer.transfer_id DESC";
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, account_id, account_id);
+        try {
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, account_id, account_id);
 
-        while (results.next()) {
-            transfers.add(mapRowToClientTransferObject(results));
+            while (results.next()) {
+                transfers.add(mapRowToClientTransferObject(results));
+            }
         }
-
+        catch (DataAccessException err){
+            throw new DaoException();
+        }
         return transfers;
     }
 
@@ -168,13 +204,17 @@ public class TransferDao {
                 "JOIN transfer_status ON transfer_status.transfer_status_id = transfer.transfer_status_id " +
                 "JOIN transfer_type ON transfer_type.transfer_type_id = transfer.transfer_type_id " +
                 "WHERE transfer.transfer_id = ? ";
+        try {
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, account_id);
 
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, account_id);
-
-        if (results.next()) {
-            return mapRowToClientTransferObject(results);
+            if (results.next()) {
+                return mapRowToClientTransferObject(results);
+            }
+            return null;
         }
-        return null;
+        catch (DataAccessException err){
+            throw new DaoException();
+        }
     }
 
     private Transfer mapRowToTransfer(SqlRowSet rs) {

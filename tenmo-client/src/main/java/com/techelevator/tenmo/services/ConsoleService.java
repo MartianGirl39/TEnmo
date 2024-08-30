@@ -17,7 +17,7 @@ public class ConsoleService {
         int menuSelection;
         System.out.print(prompt);
         try {
-            menuSelection = Integer.parseInt(scanner.nextLine());
+            menuSelection = Integer.parseInt(scanner.nextLine().strip());
         } catch (NumberFormatException e) {
             menuSelection = -1;
         }
