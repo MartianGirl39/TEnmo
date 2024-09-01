@@ -58,7 +58,7 @@ public class ConsoleService {
 
     public String promptForString(String prompt) {
         System.out.print(prompt);
-        return scanner.nextLine();
+        return scanner.nextLine().strip();
     }
 
     public int promptForInt(String prompt) {
