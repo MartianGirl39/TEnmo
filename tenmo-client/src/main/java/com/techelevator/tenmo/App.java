@@ -1,7 +1,6 @@
 package com.techelevator.tenmo;
 
-import com.techelevator.exceptions.InsufficientFunds;
-import com.techelevator.exceptions.LoginFailureException;
+import com.techelevator.exceptions.*;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.Transfer;
@@ -11,7 +10,6 @@ import com.techelevator.tenmo.model.dto.TransferStatusDto;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
 import com.techelevator.tenmo.services.TenmoService;
-import org.springframework.web.client.RestClientException;
 
 import java.math.BigDecimal;
 
@@ -113,8 +111,14 @@ public class App {
     private void viewCurrentBalance() {
         String balanceBanner = consoleService.readAsciiArtFromFile("src/main/resources/banners/Balance.txt");
         System.out.println(balanceBanner + "\n");
-
-        double balance = tenmoService.getAccountBalance();
+        double balance = 0.0;
+        try {
+            balance = tenmoService.getAccountBalance();
+        }
+        catch(TenmoRequestException e){
+            System.out.println(e.getMessage());
+            return;
+        }
         if (balance <= 50) {
             String sadFace = consoleService.readAsciiArtFromFile("src/main/resources/banners/sad.txt");
             System.out.print(sadFace + "    $");
@@ -131,7 +135,14 @@ public class App {
     }
 
     private void viewTransferHistory() {
-        Transfer[] pastTransfers = tenmoService.getTransferByUser();
+        Transfer[] pastTransfers = new Transfer[0];
+        try {
+            pastTransfers = tenmoService.getTransferByUser();
+        }
+        catch(TenmoRequestException e){
+            System.out.println(e.getMessage());
+            return;
+        }
         System.out.println("__________________________________");
         for (Transfer transfer : pastTransfers) {
             System.out.println(transfer);
@@ -142,8 +153,15 @@ public class App {
 
     private void viewPendingRequests() {
         boolean stay = true;
+        Transfer[] pending = new Transfer[0];
         while (stay) {
-            Transfer[] pending = tenmoService.viewPending();
+            try {
+                pending = tenmoService.viewPending();
+            }
+            catch(TenmoRequestException e){
+                System.out.println(e.getMessage());
+                return;
+            }
             if (pending.length == 0) {
                 System.out.println("You are all caught up!");
                 return;
@@ -165,11 +183,16 @@ public class App {
             int transactionIdToChange = 0;
             try {
                 transactionIdToChange = Integer.parseInt(option);
-            } catch (NumberFormatException e) {
-                System.out.println("Enter a valid number or x");
+                transfer = tenmoService.getTransferById(transactionIdToChange);
+            }
+            catch (NumberFormatException e){
+                System.out.println("Please enter a valid number");
                 continue;
             }
-            transfer = tenmoService.getTransferById(transactionIdToChange);
+            catch(TenmoRequestException e){
+                System.out.println(e.getMessage());
+                return;
+            }
             if (transfer != null) {
                 isValid = true;
             }
@@ -183,23 +206,20 @@ public class App {
             updated.setSendingAccount(transfer.getSender().getAccount_id());
             if (option == 1) {
                 updated.setStatus("Approved");
-                try {
-                    tenmoService.changeTransferStatus(updated);
-                } catch (RestClientException e) {
-                    System.out.println("User cannot approve their own requests");
-                }
-                break;
             } else if (option == 2) {
                 updated.setStatus("Rejected");
-                try {
-                    tenmoService.changeTransferStatus(updated);
-                } catch (RestClientException e) {
-                    System.out.println("User cannot Reject their own requests");
-                }
-                break;
             } else {
                 System.out.println("Please enter a valid option");
+                continue;
             }
+            try {
+                tenmoService.changeTransferStatus(updated);
+            }
+            catch(TenmoRequestException e){
+                System.out.println(e.getMessage());
+                return;
+            }
+            isValid = true;
         }
     }
 
@@ -232,7 +252,8 @@ public class App {
         transfer.setMessage(message);
         try {
             tenmoService.sendTEBucksTo(transfer);
-        } catch (InsufficientFunds e) {
+        }
+        catch(TenmoRequestException e){
             System.out.println(e.getMessage());
         }
     }
@@ -253,7 +274,13 @@ public class App {
                 System.out.println("please enter a valid index");
                 continue;
             }
-            accountToReceiveMoney = tenmoService.getUserAccount(accounts[input-1].getUsername());
+            try {
+                accountToReceiveMoney = tenmoService.getUserAccount(accounts[input - 1].getUsername());
+            }
+            catch(TenmoRequestException e){
+                System.out.println(e.getMessage());
+                return;
+            }
             if (accountToReceiveMoney != null) {
                 isValid = true;
             }

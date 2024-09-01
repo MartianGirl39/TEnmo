@@ -23,16 +23,17 @@ public class AccountDao {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Account getAccountByUserId(int id) {
-        Account account = null;
-        String sql = "SELECT * FROM account WHERE user_id = ?;";
+    public UserAccountDto getAccountByUserId(int id) {
+        UserAccountDto account = null;
+        String sql = "SELECT account_id, balance, username FROM account JOIN tenmo_user ON tenmo_user.user_id = account.user_id WHERE account.user_id = ?;";
         try {
             SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
             if (results.next()) {
-                account = mapRowToAccount(results);
+                account = mapRowToUserAccount(results);
             }
         }
         catch (DataAccessException err){
+            System.out.println(err.getMessage());
             throw new DaoException();
         }
         return account;
@@ -151,7 +152,7 @@ public class AccountDao {
         return account;
     }
 
-    public List<AccountDto> getAccount(int userAccount){
+    public List<AccountDto> getAccounts(int userAccount){
         List<AccountDto> account = new ArrayList<>();
         // select every account from account
         String sql = "SELECT account.account_id, tenmo_user.username FROM account JOIN tenmo_user ON tenmo_user.user_id = account.user_id WHERE account_id != ?;";

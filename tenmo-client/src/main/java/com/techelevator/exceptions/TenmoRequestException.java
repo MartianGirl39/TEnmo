@@ -1,6 +1,6 @@
 package com.techelevator.exceptions;
 
-public abstract class  TenmoRequestException extends RuntimeException {
+public class TenmoRequestException extends RuntimeException {
 
     private int statusCode;
 
