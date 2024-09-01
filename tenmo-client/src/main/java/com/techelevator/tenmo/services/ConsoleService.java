@@ -3,6 +3,7 @@ package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.model.UserCredentials;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -17,7 +18,7 @@ public class ConsoleService {
         int menuSelection;
         System.out.print(prompt);
         try {
-            menuSelection = Integer.parseInt(scanner.nextLine());
+            menuSelection = Integer.parseInt(scanner.nextLine().strip());
         } catch (NumberFormatException e) {
             menuSelection = -1;
         }
