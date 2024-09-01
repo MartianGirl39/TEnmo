@@ -34,6 +34,7 @@ public class App extends JFrame {
     private JLabel faceLabel = new JLabel();
     private JLabel textLabel = new JLabel();
     private JLabel pendingLabel = new JLabel();
+    private JLabel friendsConfirmLabel = new JLabel();
 
     public App() {
         setTitle("TEnmo Companion");
@@ -63,11 +64,13 @@ public class App extends JFrame {
             // Create JLabels for the face and the text
             textLabel.setText("Welcome to TEnmo friend");
             pendingLabel.setText("");
+            friendsConfirmLabel.setText("");
             faceLabel.setText("╰(✿´⌣`✿)╯♡");
 
             // Set the font for both labels
             textLabel.setFont(boldText);
             pendingLabel.setFont(pendingText);
+            friendsConfirmLabel.setFont(pendingText);
             faceLabel.setFont(unicode);
 
 
@@ -75,6 +78,7 @@ public class App extends JFrame {
             textLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             pendingLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             pendingLabel.setBorder(BorderFactory.createEmptyBorder(30, 0, 0, 0)); // Top, Left, Bottom, Right
+            friendsConfirmLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             faceLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             faceLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0)); // Top, Left, Bottom, Right
 
@@ -82,6 +86,7 @@ public class App extends JFrame {
             panel.add(Box.createVerticalGlue());
             panel.add(textLabel);
             panel.add(pendingLabel);
+            panel.add(friendsConfirmLabel);
             panel.add(faceLabel);
             panel.add(Box.createVerticalGlue());
 
@@ -177,6 +182,7 @@ public class App extends JFrame {
                 System.out.println("Invalid Selection");
             }
             consoleService.pause();
+            updatePendingLabel();
         }
     }
 
@@ -199,6 +205,16 @@ public class App extends JFrame {
         for (Transfer transfer : pastTransfers) {
             System.out.println(transfer);
             textLabel.setText("You have made " + pastTransfers.length + " transfers");
+            if (pastTransfers.length == 0) {
+                pendingLabel.setText("It's time to connect with friends!");
+                friendsConfirmLabel.setText("I'll always be here for you!");
+            } else if (pastTransfers.length > 0 && pastTransfers.length < 11) {
+                pendingLabel.setText("You've been busy!");
+                friendsConfirmLabel.setText("xoxoxo");
+            } else {
+                pendingLabel.setText("My oh my!");
+                friendsConfirmLabel.setText("you are very popular");
+            }
             faceLabel.setText("(｡☉౪ ⊙｡)");
         }
 
@@ -228,7 +244,8 @@ public class App extends JFrame {
         double balance = tenmoService.getAccountBalance();
         faceLabel.setText("( ๑ ❛ ڡ ❛ ๑ )❤");
         textLabel.setText("Available Balance: " + balance);
-
+        pendingLabel.setText("How much should you send to "+accountToReceiveMoney.getUsername());
+        friendsConfirmLabel.setText("");
         BigDecimal amount = consoleService.promptForBigDecimal("Select the amount to send: ");
         TransferDto transfer = new TransferDto();
         transfer.setAccount(accountToReceiveMoney.getAccount_id());
@@ -240,6 +257,7 @@ public class App extends JFrame {
             faceLabel.setText("(っ˘з(˘⌣˘ )");
             textLabel.setText("Money Sent");
             consoleService.pause();
+            updatePendingLabel();
             balance = tenmoService.getAccountBalance();
             textLabel.setText("Available Balance: " + balance);
             faceLabel.setText("(｡☉౪ ⊙｡)");
@@ -289,6 +307,10 @@ public class App extends JFrame {
                 continue;
             }
             accountToReceiveMoney = tenmoService.getUserAccount(accounts[input - 1].getUsername());
+            currentUser.getUser().getUsername().equals(accountToReceiveMoney.getUsername());
+            pendingLabel.setText("How much should " + accountToReceiveMoney.getUsername() + " send you?");
+            friendsConfirmLabel.setText("");
+
             if (accountToReceiveMoney != null) {
                 isValid = true;
             }
@@ -303,10 +325,10 @@ public class App extends JFrame {
         Transfer[] pending = tenmoService.viewPending();
         System.out.println(pending.length);
         for (Transfer transfer : pending) {
-            System.out.println(transfer);
+            if (transfer.getSender().getUsername().equals(currentUser.getUser().getUsername())) {
+                System.out.println(transfer);
+            }
         }
-
-
     }
 
     private Transfer selectTransfer() {
@@ -339,7 +361,8 @@ public class App extends JFrame {
         boolean isValid = false;
         while (!isValid) {
             String amount = String.valueOf(transfer.getAmount());
-            pendingLabel.setText("Send $" + amount + " ?");
+            pendingLabel.setText("Send $" + amount + " to " + transfer.getReceiver().getUsername() + " ?");
+            friendsConfirmLabel.setText("");
             int option = consoleService.promptForInt("Press 1 to approve \nPress 2 to reject: ");
             TransferStatusDto updated = new TransferStatusDto();
             updated.setId(transfer.getTransfer_id());
@@ -349,10 +372,11 @@ public class App extends JFrame {
                 try {
                     tenmoService.changeTransferStatus(updated);
                     faceLabel.setText("╰( ⁰ ਊ ⁰ )━☆ﾟ.*･｡ﾟ");
-                    updatePendingLabel();
+                    pendingLabel.setText("Money Sent!");
                     balance = tenmoService.getAccountBalance();
                     textLabel.setText("Available Balance: " + balance);
                     consoleService.pause();
+                    updatePendingLabel();
                     faceLabel.setText("(♡´౪`♡)");
 
 
@@ -382,11 +406,29 @@ public class App extends JFrame {
 
     private void updatePendingLabel() {
         Transfer[] pendingRequests = tenmoService.viewPending();
-        String numberPending = String.valueOf(pendingRequests.length);
-        if (numberPending.equals(0)) {
-            pendingLabel.setText("You are all caught up! No pending requests.");
+        int numRequestsOfUser = 0;
+        int numRequestsFromUser = 0;
+        for (Transfer transfer : pendingRequests) {
+            if (transfer.getSender().getUsername().equals(currentUser.getUser().getUsername())) {
+                numRequestsOfUser++;
+            }
+            if (transfer.getReceiver().getUsername().equals(currentUser.getUser().getUsername())) {
+                numRequestsFromUser++;
+            }
+        }
+        String numberPending = String.valueOf(numRequestsOfUser);
+        String requestsOutToOthers = String.valueOf(numRequestsFromUser);
+
+        if (numRequestsOfUser == 0) {
+            pendingLabel.setText("You are all caught up! No one is asking for money!");
         } else {
             pendingLabel.setText("You have " + numberPending + " pending requests");
         }
+        if (numRequestsFromUser == 0) {
+            friendsConfirmLabel.setText("Your friends have processed all of your requests!");
+        } else {
+            friendsConfirmLabel.setText("Friends have not decided on " + requestsOutToOthers + " of your requests");
+        }
     }
 }
+
