@@ -14,6 +14,7 @@ import com.techelevator.tenmo.services.TenmoService;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -175,11 +176,13 @@ public class App extends JFrame {
             } else if (menuSelection == 5) {
                 requestBucks();
             } else if (menuSelection == 0) {
+                dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
                 continue;
             } else {
                 System.out.println("Invalid Selection");
             }
             consoleService.pause();
+            textLabel.setText("What would you like to do?");
             updatePendingLabel();
         }
     }
@@ -215,7 +218,7 @@ public class App extends JFrame {
                 pendingLabel.setText("It's time to connect with friends!");
                 friendsConfirmLabel.setText("I'll always be here for you!");
             } else if (transferCount > 0 && transferCount < 11) {
-                pendingLabel.setText("You've been busy!");
+                pendingLabel.setText("Good to see you connect with others!");
                 friendsConfirmLabel.setText("xoxoxo");
             } else {
                 pendingLabel.setText("My oh my!");
