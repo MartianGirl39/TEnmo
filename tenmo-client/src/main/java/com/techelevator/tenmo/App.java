@@ -205,21 +205,24 @@ public class App extends JFrame {
     private void viewTransferHistory() {
         try {
             Transfer[] pastTransfers = tenmoService.getTransferByUser();
+            int transferCount = pastTransfers.length;
             for (Transfer transfer : pastTransfers) {
                 System.out.println(transfer);
-                textLabel.setText("You have made " + pastTransfers.length + " transfers");
-                if (pastTransfers.length == 0) {
-                    pendingLabel.setText("It's time to connect with friends!");
-                    friendsConfirmLabel.setText("I'll always be here for you!");
-                } else if (pastTransfers.length > 0 && pastTransfers.length < 11) {
-                    pendingLabel.setText("You've been busy!");
-                    friendsConfirmLabel.setText("xoxoxo");
-                } else {
-                    pendingLabel.setText("My oh my!");
-                    friendsConfirmLabel.setText("you are very popular");
-                }
-                faceLabel.setText("(｡☉౪ ⊙｡)");
             }
+            textLabel.setText("You have made " + transferCount + " transfers");
+
+            if (transferCount == 0) {
+                pendingLabel.setText("It's time to connect with friends!");
+                friendsConfirmLabel.setText("I'll always be here for you!");
+            } else if (transferCount > 0 && transferCount < 11) {
+                pendingLabel.setText("You've been busy!");
+                friendsConfirmLabel.setText("xoxoxo");
+            } else {
+                pendingLabel.setText("My oh my!");
+                friendsConfirmLabel.setText("you are very popular");
+            }
+            faceLabel.setText("(｡☉౪ ⊙｡)");
+
         } catch (TenmoRequestException e) {
             System.out.println(e.getMessage());
         }
