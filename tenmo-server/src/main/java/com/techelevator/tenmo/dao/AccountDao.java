@@ -2,6 +2,8 @@ package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.exception.DaoException;
 import com.techelevator.tenmo.model.Account;
+import com.techelevator.tenmo.model.dto.UserAccountDto;
+import org.springframework.dao.DataAccessException;
 import com.techelevator.tenmo.model.dto.AccountDto;
 import com.techelevator.tenmo.model.dto.UserAccountDto;
 import org.springframework.dao.DataAccessException;
@@ -11,6 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
+import java.net.UnknownServiceException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,19 +26,20 @@ public class AccountDao {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Account getAccountByUserId(int id) {
-        Account account = null;
-        String sql = "SELECT * FROM account WHERE user_id = ?;";
+    public UserAccountDto getAccountByUserId(int id) {
+        UserAccountDto account = null;
+        String sql = "SELECT account_id, balance, username FROM account JOIN tenmo_user ON tenmo_user.user_id = account.user_id WHERE account.user_id = ?;";
         try {
             SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
             if (results.next()) {
-                account = mapRowToAccount(results);
+                account = mapRowToUserAccount(results);
             }
+            return account;
         }
         catch (DataAccessException err){
+            System.out.println(err.getMessage());
             throw new DaoException();
         }
-        return account;
     }
 
     public Account getAccountById(int id) {
@@ -46,11 +50,11 @@ public class AccountDao {
             if (results.next()) {
                 account = mapRowToAccount(results);
             }
+            return account;
         }
         catch (DataAccessException err){
             throw new DaoException();
         }
-        return account;
     }
 
     public List<Account> listUser(int account_id) {
@@ -63,11 +67,11 @@ public class AccountDao {
             while (results.next()) {
                 account.add(mapRowToAccount(results));
             }
+            return account;
         }
         catch (DataAccessException err){
             throw new DaoException();
         }
-        return account;
     }
 
     public void transferBalance(int sender, int receiver, double amountToAdd){
@@ -151,7 +155,7 @@ public class AccountDao {
         return account;
     }
 
-    public List<AccountDto> getAccount(int userAccount){
+    public List<AccountDto> getAccounts(int userAccount){
         List<AccountDto> account = new ArrayList<>();
         // select every account from account
         String sql = "SELECT account.account_id, tenmo_user.username FROM account JOIN tenmo_user ON tenmo_user.user_id = account.user_id WHERE account_id != ?;";

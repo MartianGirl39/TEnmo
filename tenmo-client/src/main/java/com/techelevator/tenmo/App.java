@@ -1,7 +1,7 @@
 package com.techelevator.tenmo;
 
-import com.techelevator.exceptions.InsufficientFunds;
 import com.techelevator.exceptions.LoginFailureException;
+import com.techelevator.exceptions.TenmoRequestException;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.Transfer;
@@ -11,7 +11,6 @@ import com.techelevator.tenmo.model.dto.TransferStatusDto;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
 import com.techelevator.tenmo.services.TenmoService;
-import org.springframework.web.client.RestClientException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -158,7 +157,6 @@ public class App extends JFrame {
         }
         tenmoService.setToken(currentUser.getToken());
         updatePendingLabel();
-
     }
 
     private void mainMenu() {
@@ -187,72 +185,82 @@ public class App extends JFrame {
     }
 
     private void viewCurrentBalance() {
-        double balance = tenmoService.getAccountBalance();
-        textLabel.setText("Available Balance: " + balance);
-        System.out.println("\n     ＄");
-        System.out.println("   ▂█▀█▂▂ ▀█▀ ▐⯊ █▚▌ █▚▞▌ ⬤ ▂▂    ");
-        System.out.println("  █▀█▀█▀█══════Balance═════█████");
-        System.out.println(" ▄█▄█▄█▄█▄" + "            " + "     █████");
-        System.out.print("▄█▄██\uD83C\uDF9B██▄█▄ " + "    $" + balance + " " + "      ██");
-        System.out.println("\n                 _____\n" +
-                "            //  /_..._\\    //\n" +
-                "           //  (0[###]0)  //\n" +
-                "          //    ''   ''  // ");
+        try {
+            double balance = tenmoService.getAccountBalance();
+            textLabel.setText("Available Balance: " + balance);
+            System.out.println("\n     ＄");
+            System.out.println("   ▂█▀█▂▂ ▀█▀ ▐⯊ █▚▌ █▚▞▌ ⬤ ▂▂    ");
+            System.out.println("  █▀█▀█▀█══════Balance═════█████");
+            System.out.println(" ▄█▄█▄█▄█▄" + "            " + "     █████");
+            System.out.print("▄█▄██\uD83C\uDF9B██▄█▄ " + "    $" + balance + " " + "      ██");
+            System.out.println("\n                 _____\n" +
+                    "            //  /_..._\\    //\n" +
+                    "           //  (0[###]0)  //\n" +
+                    "          //    ''   ''  // ");
+        } catch (TenmoRequestException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void viewTransferHistory() {
-        Transfer[] pastTransfers = tenmoService.getTransferByUser();
-        for (Transfer transfer : pastTransfers) {
-            System.out.println(transfer);
-            textLabel.setText("You have made " + pastTransfers.length + " transfers");
-            if (pastTransfers.length == 0) {
-                pendingLabel.setText("It's time to connect with friends!");
-                friendsConfirmLabel.setText("I'll always be here for you!");
-            } else if (pastTransfers.length > 0 && pastTransfers.length < 11) {
-                pendingLabel.setText("You've been busy!");
-                friendsConfirmLabel.setText("xoxoxo");
-            } else {
-                pendingLabel.setText("My oh my!");
-                friendsConfirmLabel.setText("you are very popular");
+        try {
+            Transfer[] pastTransfers = tenmoService.getTransferByUser();
+            for (Transfer transfer : pastTransfers) {
+                System.out.println(transfer);
+                textLabel.setText("You have made " + pastTransfers.length + " transfers");
+                if (pastTransfers.length == 0) {
+                    pendingLabel.setText("It's time to connect with friends!");
+                    friendsConfirmLabel.setText("I'll always be here for you!");
+                } else if (pastTransfers.length > 0 && pastTransfers.length < 11) {
+                    pendingLabel.setText("You've been busy!");
+                    friendsConfirmLabel.setText("xoxoxo");
+                } else {
+                    pendingLabel.setText("My oh my!");
+                    friendsConfirmLabel.setText("you are very popular");
+                }
+                faceLabel.setText("(｡☉౪ ⊙｡)");
             }
-            faceLabel.setText("(｡☉౪ ⊙｡)");
+        } catch (TenmoRequestException e) {
+            System.out.println(e.getMessage());
         }
-
-
     }
 
     private void viewPendingRequests() {
         // Get the list of pending transfers
-        Transfer[] pendingRequests = tenmoService.viewPending();
+        try {
+            Transfer[] pendingRequests = tenmoService.viewPending();
 
-        // Check if the list is empty
-        if (pendingRequests.length == 0) {
-            System.out.println("You are all caught up! No pending requests.");
-            return; // Exit the method, returning to the main menu
-        }
+            // Check if the list is empty
+            if (pendingRequests.length == 0) {
+                System.out.println("You are all caught up! No pending requests.");
+                return; // Exit the method, returning to the main menu
+            }
 
-        // If there are pending requests, proceed with the rest of the method
-        listPendingRequests();
-        Transfer transfer = selectTransfer();
-        if (transfer != null) {
-            finalizePending(transfer);
+            // If there are pending requests, proceed with the rest of the method
+            listPendingRequests();
+            Transfer transfer = selectTransfer();
+            if (transfer != null) {
+                finalizePending(transfer);
+            }
+        } catch (TenmoRequestException e) {
+            System.out.println(e.getMessage());
         }
     }
 
     private void sendBucks() {
         Account accountToReceiveMoney = chooseAccount();
-        double balance = tenmoService.getAccountBalance();
-        faceLabel.setText("( ๑ ❛ ڡ ❛ ๑ )❤");
-        textLabel.setText("Available Balance: " + balance);
-        pendingLabel.setText("How much should you send to "+accountToReceiveMoney.getUsername());
-        friendsConfirmLabel.setText("");
-        BigDecimal amount = consoleService.promptForBigDecimal("Select the amount to send: ");
-        TransferDto transfer = new TransferDto();
-        transfer.setAccount(accountToReceiveMoney.getAccount_id());
-        transfer.setAmount(amount.doubleValue());
-        String message = consoleService.promptForString("What's this for?: ");
-        transfer.setMessage(message);
         try {
+            double balance = tenmoService.getAccountBalance();
+            faceLabel.setText("( ๑ ❛ ڡ ❛ ๑ )❤");
+            textLabel.setText("Available Balance: " + balance);
+            pendingLabel.setText("How much should you send to " + accountToReceiveMoney.getUsername());
+            friendsConfirmLabel.setText("");
+            BigDecimal amount = consoleService.promptForBigDecimal("Select the amount to send: ");
+            TransferDto transfer = new TransferDto();
+            transfer.setAccount(accountToReceiveMoney.getAccount_id());
+            transfer.setAmount(amount.doubleValue());
+            String message = consoleService.promptForString("What's this for?: ");
+            transfer.setMessage(message);
             tenmoService.sendTEBucksTo(transfer);
             faceLabel.setText("(っ˘з(˘⌣˘ )");
             textLabel.setText("Money Sent");
@@ -261,75 +269,89 @@ public class App extends JFrame {
             balance = tenmoService.getAccountBalance();
             textLabel.setText("Available Balance: " + balance);
             faceLabel.setText("(｡☉౪ ⊙｡)");
-        } catch (InsufficientFunds e) {
+        } catch (TenmoRequestException e) {
             System.out.println(e.getMessage());
         }
     }
 
-
     private void requestBucks() {
-        Account accountToReceiveMoney = chooseAccount();
-        double balance = tenmoService.getAccountBalance();
-        faceLabel.setText("♥(ˆ⌣ˆԅ)");
-        textLabel.setText("Available Balance: " + balance);
-        BigDecimal amount = consoleService.promptForBigDecimal("Select the amount to receive: ");
-        TransferDto transfer = new TransferDto();
-        transfer.setAccount(accountToReceiveMoney.getAccount_id());
-        transfer.setAmount(amount.doubleValue());
-        String message = consoleService.promptForString("What's this for?: ");
-        transfer.setMessage(message);
-        tenmoService.requestTEBucksFrom(transfer);
-        faceLabel.setText("('_')┏oo┓('_')");
-        updatePendingLabel();
-        textLabel.setText("Request Sent");
-        consoleService.pause();
-        textLabel.setText("Available Balance: " + balance);
-        faceLabel.setText("ʕಠಿ౪ಠʔ");
+        try {
+            Account accountToReceiveMoney = chooseAccount();
+            double balance = tenmoService.getAccountBalance();
+            faceLabel.setText("♥(ˆ⌣ˆԅ)");
+            textLabel.setText("Available Balance: " + balance);
+            BigDecimal amount = consoleService.promptForBigDecimal("Select the amount to receive: ");
+            TransferDto transfer = new TransferDto();
+            transfer.setAccount(accountToReceiveMoney.getAccount_id());
+            transfer.setAmount(amount.doubleValue());
+            String message = consoleService.promptForString("What's this for?: ");
+            transfer.setMessage(message);
+            tenmoService.requestTEBucksFrom(transfer);
+            faceLabel.setText("('_')┏oo┓('_')");
+            updatePendingLabel();
+            textLabel.setText("Request Sent");
+            consoleService.pause();
+            textLabel.setText("Available Balance: " + balance);
+            faceLabel.setText("ʕಠಿ౪ಠʔ");
+        } catch (TenmoRequestException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private Account chooseAccount() {
         boolean isValid = false;
         Account accountToReceiveMoney = null;
+
         while (!isValid) {
             System.out.println("  ___               ___  \n" +
                     " (o o)             (o o) \n" +
                     "(  V  ) \uD835\uDE4E\uD835\uDE5A\uD835\uDE61\uD835\uDE5A\uD835\uDE58\uD835\uDE69 \uD835\uDE50\uD835\uDE68\uD835\uDE5A\uD835\uDE67 (  V  )\n" +
                     "══m═m══════════════════m═m══\n");
+            try {
+                Account[] accounts = tenmoService.getAccounts();
+                for (int i = 0; i < accounts.length; i++) {
+                    System.out.println(i + 1 + ") " + accounts[i] + " -~··~-.¸.··._.·´¯·\n");
 
-            Account[] accounts = tenmoService.getAccounts();
-            for (int i = 0; i < accounts.length; i++) {
-                System.out.println(i + 1 + ") " + accounts[i] + " -~··~-.¸.··._.·´¯·\n");
+                }
+                int input = consoleService.promptForInt("Enter Number: ");
+                if (input > accounts.length || input < 1) {
+                    System.out.println("please enter a valid index");
+                    continue;
+                }
+                accountToReceiveMoney = tenmoService.getUserAccount(accounts[input - 1].getUsername());
+                currentUser.getUser().getUsername().equals(accountToReceiveMoney.getUsername());
+                pendingLabel.setText("How much should " + accountToReceiveMoney.getUsername() + " send you?");
+                friendsConfirmLabel.setText("");
 
-            }
-            int input = consoleService.promptForInt("Enter Number: ");
-            if (input > accounts.length || input < 1) {
-                System.out.println("please enter a valid index");
-                continue;
-            }
-            accountToReceiveMoney = tenmoService.getUserAccount(accounts[input - 1].getUsername());
-            currentUser.getUser().getUsername().equals(accountToReceiveMoney.getUsername());
-            pendingLabel.setText("How much should " + accountToReceiveMoney.getUsername() + " send you?");
-            friendsConfirmLabel.setText("");
-
-            if (accountToReceiveMoney != null) {
-                isValid = true;
+                if (accountToReceiveMoney != null) {
+                    isValid = true;
+                }
+            } catch (TenmoRequestException e) {
+                System.out.println(e.getMessage());
+                break;
             }
         }
         return accountToReceiveMoney;
     }
 
+
     private void listPendingRequests() {
-        double balance = tenmoService.getAccountBalance();
-        faceLabel.setText("乁( ⁰͡ Ĺ̯ ⁰͡ ) ㄏ");
-        textLabel.setText("Available Balance: " + balance);
-        Transfer[] pending = tenmoService.viewPending();
-        System.out.println(pending.length);
-        for (Transfer transfer : pending) {
-            if (transfer.getSender().getUsername().equals(currentUser.getUser().getUsername())) {
-                System.out.println(transfer);
+        try {
+            double balance = tenmoService.getAccountBalance();
+            faceLabel.setText("乁( ⁰͡ Ĺ̯ ⁰͡ ) ㄏ");
+            textLabel.setText("Available Balance: " + balance);
+            Transfer[] pending = tenmoService.viewPending();
+            System.out.println(pending.length);
+            for (Transfer transfer : pending) {
+                if (transfer.getSender().getUsername().equals(currentUser.getUser().getUsername())) {
+                    System.out.println(transfer);
+                }
             }
+        } catch (TenmoRequestException e) {
+            System.out.println(e.getMessage());
         }
     }
+
 
     private Transfer selectTransfer() {
         boolean isValid = false;
@@ -343,11 +365,14 @@ public class App extends JFrame {
             int transactionIdToChange = 0;
             try {
                 transactionIdToChange = Integer.parseInt(option);
+                transfer = tenmoService.getTransferById(transactionIdToChange);
             } catch (NumberFormatException e) {
-                System.out.println("Enter a valid number or x");
+                System.out.println("Please enter a valid number");
                 continue;
+            } catch (TenmoRequestException e) {
+                System.out.println(e.getMessage());
+                return null;
             }
-            transfer = tenmoService.getTransferById(transactionIdToChange);
             if (transfer != null) {
                 isValid = true;
             }
@@ -378,12 +403,9 @@ public class App extends JFrame {
                     consoleService.pause();
                     updatePendingLabel();
                     faceLabel.setText("(♡´౪`♡)");
-
-
-                } catch (RestClientException e) {
-                    System.out.println("User cannot approve their own requests");
+                } catch (TenmoRequestException e) {
+                    System.out.println(e.getMessage());
                     faceLabel.setText("┌( ◕ 益 ◕ )ᓄ");
-
                 }
                 break;
             } else if (option == 2) {
@@ -392,8 +414,8 @@ public class App extends JFrame {
                     tenmoService.changeTransferStatus(updated);
                     updatePendingLabel();
                     faceLabel.setText("'''⌐(ಠ۾ಠ)¬'''");
-                } catch (RestClientException e) {
-                    System.out.println("User cannot Reject their own requests");
+                } catch (TenmoRequestException e) {
+                    System.out.println(e.getMessage());
                     faceLabel.setText("┌( ◕ 益 ◕ )ᓄ");
                 }
                 break;
@@ -401,33 +423,38 @@ public class App extends JFrame {
                 System.out.println("Please enter a valid option");
                 faceLabel.setText("(΄◞ิ౪◟ิ‵)");
             }
+            isValid = true;
         }
     }
 
     private void updatePendingLabel() {
-        Transfer[] pendingRequests = tenmoService.viewPending();
-        int numRequestsOfUser = 0;
-        int numRequestsFromUser = 0;
-        for (Transfer transfer : pendingRequests) {
-            if (transfer.getSender().getUsername().equals(currentUser.getUser().getUsername())) {
-                numRequestsOfUser++;
+        try {
+            Transfer[] pendingRequests = tenmoService.viewPending();
+            int numRequestsOfUser = 0;
+            int numRequestsFromUser = 0;
+            for (Transfer transfer : pendingRequests) {
+                if (transfer.getSender().getUsername().equals(currentUser.getUser().getUsername())) {
+                    numRequestsOfUser++;
+                }
+                if (transfer.getReceiver().getUsername().equals(currentUser.getUser().getUsername())) {
+                    numRequestsFromUser++;
+                }
             }
-            if (transfer.getReceiver().getUsername().equals(currentUser.getUser().getUsername())) {
-                numRequestsFromUser++;
-            }
-        }
-        String numberPending = String.valueOf(numRequestsOfUser);
-        String requestsOutToOthers = String.valueOf(numRequestsFromUser);
+            String numberPending = String.valueOf(numRequestsOfUser);
+            String requestsOutToOthers = String.valueOf(numRequestsFromUser);
 
-        if (numRequestsOfUser == 0) {
-            pendingLabel.setText("You are all caught up! No one is asking for money!");
-        } else {
-            pendingLabel.setText("You have " + numberPending + " pending requests");
-        }
-        if (numRequestsFromUser == 0) {
-            friendsConfirmLabel.setText("Your friends have processed all of your requests!");
-        } else {
-            friendsConfirmLabel.setText("Friends have not decided on " + requestsOutToOthers + " of your requests");
+            if (numRequestsOfUser == 0) {
+                pendingLabel.setText("You are all caught up! No one is asking for money!");
+            } else {
+                pendingLabel.setText("You have " + numberPending + " pending requests");
+            }
+            if (numRequestsFromUser == 0) {
+                friendsConfirmLabel.setText("Your friends have processed all of your requests!");
+            } else {
+                friendsConfirmLabel.setText("Friends have not decided on " + requestsOutToOthers + " of your requests");
+            }
+        } catch (TenmoRequestException e) {
+            System.out.println(e.getMessage());
         }
     }
 }
