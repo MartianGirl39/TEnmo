@@ -1,8 +1,8 @@
 package com.techelevator.tenmo.model.dto;
 
 public class AccountDto {
-    int account_id;
-    String username;
+    private int account_id;
+    private String username;
 
     public int getAccount_id() {
         return account_id;

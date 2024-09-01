@@ -6,6 +6,10 @@ import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.TransferStatus;
 import com.techelevator.tenmo.model.User;
+import com.techelevator.tenmo.model.dto.ClientTransferDto;
+import com.techelevator.tenmo.model.dto.TransferDto;
+import com.techelevator.tenmo.model.dto.TransferStatusDto;
+import com.techelevator.tenmo.model.dto.UserAccountDto;
 import com.techelevator.tenmo.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -91,7 +95,14 @@ public class AccountController {
             UserAccountDto account = this.getAndValidateUser(principal.getName());
             if (account.getAccount_id() != transfer.getSendingAccount()) {
                 // throw 403
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot approve or reject this transaction");
+                String message;
+                if(transfer.getStatus().equals("Approved")) {
+                    message = "User cannot Approve their own requests";
+                }
+                else {
+                    message = "User cannot Reject their own requests";
+                }
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, message);
             }
             TransferStatus status = transferStatusDao.getStatusByName(transfer.getStatus());
             if (status == null) {
@@ -187,15 +198,12 @@ public class AccountController {
     }
 
     private UserAccountDto getAndValidateUser(String username) {
-        System.out.println("Inside function");
         User user = userDao.getUserByUsername(username);
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find user, are you logged in as a valid TEnmo user?");
         }
-        System.out.println(user.getUsername());
         UserAccountDto account = accountDao.getAccountByUserId(user.getId());
         if (account == null) {
-            System.out.println("came back null");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find account, are you logged in as a valid TEnmo user?");
         }
         System.out.println(account.getUsername());

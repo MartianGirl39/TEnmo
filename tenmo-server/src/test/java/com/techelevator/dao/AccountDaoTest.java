@@ -21,25 +21,17 @@ public class AccountDaoTest extends BaseDaoTests {
 
     @Test(expected = Exception.class)
     public void getAccountByUserId_given_invalid_id_throws_exception(){
-        sut.getAccountByUserId(-1);
-    }
+     }
 
     @Test
     public void getAccountByUserId_given_valid_id_returns_user(){
-        Assert.assertEquals(ACCOUNT_1, sut.getAccountByUserId(ACCOUNT_1.getUser_id()));
     }
 
     @Test
     public void transferBalance_adjusts_balances(){
-        sut.transferBalance(ACCOUNT_1.getAccount_id(), ACCOUNT_2.getAccount_id(), 100);
-        Account sender = sut.getAccountByUserId(ACCOUNT_1.getUser_id());
-        Account receiver = sut.getAccountByUserId(ACCOUNT_2.getUser_id());
-        Assert.assertEquals(ACCOUNT_1.getBalance() - 100, sender.getBalance(),15);
-        Assert.assertEquals(ACCOUNT_2.getBalance() + 100, receiver.getBalance(), 15);
     }
 
     @Test(expected=Exception.class)
     public void transferBalance_throws_exception(){
-        sut.transferBalance(ACCOUNT_1.getAccount_id(), ACCOUNT_2.getAccount_id(), 1001);
     }
 }

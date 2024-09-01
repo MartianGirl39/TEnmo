@@ -2,6 +2,8 @@ package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.exception.DaoException;
 import com.techelevator.tenmo.model.Account;
+import com.techelevator.tenmo.model.dto.UserAccountDto;
+import org.springframework.dao.DataAccessException;
 import com.techelevator.tenmo.model.dto.AccountDto;
 import com.techelevator.tenmo.model.dto.UserAccountDto;
 import org.springframework.dao.DataAccessException;
@@ -11,6 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
+import java.net.UnknownServiceException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,12 +34,12 @@ public class AccountDao {
             if (results.next()) {
                 account = mapRowToUserAccount(results);
             }
+            return account;
         }
         catch (DataAccessException err){
             System.out.println(err.getMessage());
             throw new DaoException();
         }
-        return account;
     }
 
     public Account getAccountById(int id) {
@@ -47,11 +50,11 @@ public class AccountDao {
             if (results.next()) {
                 account = mapRowToAccount(results);
             }
+            return account;
         }
         catch (DataAccessException err){
             throw new DaoException();
         }
-        return account;
     }
 
     public List<Account> listUser(int account_id) {
@@ -64,11 +67,11 @@ public class AccountDao {
             while (results.next()) {
                 account.add(mapRowToAccount(results));
             }
+            return account;
         }
         catch (DataAccessException err){
             throw new DaoException();
         }
-        return account;
     }
 
     public void transferBalance(int sender, int receiver, double amountToAdd){
