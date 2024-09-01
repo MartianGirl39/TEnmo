@@ -68,13 +68,13 @@ public class Transfer {
 
     @Override
     public String toString() {
-        return "__________________________________" +
-                "\nTransfer Id: " + this.transfer_id +
+        return "ᆖᆖᆖTᆖrᆖaᆖnᆖsᆖfᆖeᆖrᆖᆖᆖ" +
+                "\nTransfer Id: #" + this.transfer_id +
                 "\nTransfer Type: " + this.type +
+                "\n" + this.sender + " sends money to " + this.receiver +
                 "\nTransfer Status: " + this.status +
                 "\nTransfer Amount: " + this.amount +
-                "\nMessage: ⚞" + this.message + "⚟"+
-                "\nSender " + this.sender + " sends money to " + this.receiver +
-                "\n__________________________________";
+                "\nMessage: ⚞" + this.message + "⚟\n"+
+                "ᆖᆖᆖTᆖrᆖaᆖnᆖsᆖfᆖeᆖrᆖᆖᆖ\n\n";
     }
 }
