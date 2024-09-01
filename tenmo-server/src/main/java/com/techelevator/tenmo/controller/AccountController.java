@@ -8,6 +8,7 @@ import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.dto.ClientTransferDto;
 import com.techelevator.tenmo.model.dto.TransferDto;
 import com.techelevator.tenmo.model.dto.TransferStatusDto;
+import com.techelevator.tenmo.model.dto.UserAccountDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
