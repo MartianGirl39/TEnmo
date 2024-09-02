@@ -2,9 +2,7 @@ package com.techelevator.tenmo.controller;
 
 import com.techelevator.tenmo.dao.*;
 import com.techelevator.tenmo.exception.DaoException;
-import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.TransferStatus;
 import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.dto.ClientTransferDto;
 import com.techelevator.tenmo.model.dto.TransferDto;
@@ -12,16 +10,12 @@ import com.techelevator.tenmo.model.dto.TransferStatusDto;
 import com.techelevator.tenmo.model.dto.UserAccountDto;
 import com.techelevator.tenmo.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.imageio.plugins.tiff.GeoTIFFTagSet;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -210,7 +204,6 @@ public class AccountController {
         if (account == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find account, are you logged in as a valid TEnmo user?");
         }
-        System.out.println(account.getUsername());
         return account;
     }
 }
