@@ -28,13 +28,9 @@ public class App extends JFrame {
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
 
     private AuthenticatedUser currentUser;
-    private Font unicode;
-    private Font boldText;
-    private Font pendingText;
-    private JLabel faceLabel = new JLabel();
-    private JLabel textLabel = new JLabel();
-    private JLabel pendingLabel = new JLabel();
-    private JLabel friendsConfirmLabel = new JLabel();
+    private Font unicode, boldText, pendingText;
+    private JLabel faceLabel = new JLabel(), textLabel = new JLabel(), pendingLabel = new JLabel(),
+            friendsConfirmLabel = new JLabel();
 
     public App() {
         setTitle("TEnmo Companion");
@@ -154,6 +150,7 @@ public class App extends JFrame {
         currentUser = authenticationService.login(credentials);
 
         if (currentUser == null) {
+            friendsConfirmLabel.setText("Hmm, I don't recognise that user or password");
             throw new LoginFailureException("Username or Password incorrect", 404);
         }
         tenmoService.setToken(currentUser.getToken());
@@ -176,8 +173,17 @@ public class App extends JFrame {
             } else if (menuSelection == 5) {
                 requestBucks();
             } else if (menuSelection == 0) {
+                textLabel.setText("Thanks for stopping by!");
+                pendingLabel.setText("see you soon");
+                friendsConfirmLabel.setText("");
+                faceLabel.setText("d–(^ ‿ ^ )z");
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
-                continue;
+                break;
             } else {
                 System.out.println("Invalid Selection");
             }
