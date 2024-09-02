@@ -90,32 +90,36 @@ public class AccountController {
 
     @ResponseStatus(HttpStatus.ACCEPTED)
     @RequestMapping(path = "user/account/transfer", method = RequestMethod.PUT)
-    public void updateTransfer(@RequestBody TransferStatusDto transfer, Principal principal) {
+    public void updateTransfer(@RequestBody TransferStatusDto transferData, Principal principal) {
         try {
             UserAccountDto account = this.getAndValidateUser(principal.getName());
-            if (account.getAccount_id() != transfer.getSendingAccount()) {
-                // throw 403
-                String message;
-                if(transfer.getStatus().equals("Approved")) {
-                    message = "User cannot Approve their own requests";
-                }
-                else {
-                    message = "User cannot Reject their own requests";
-                }
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, message);
+            Transfer transfer = transferDao.getTransferById(transferData.getId());
+            if(transfer.getTransfer_status_id() != 1){
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User cannot change transfer status unless status is pending");
             }
-            TransferStatus status = transferStatusDao.getStatusByName(transfer.getStatus());
-            if (status == null) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status sent to server is not allowed");
+            switch (transferData.getStatus()){
+                case "Approved":
+                    if(account.getAccount_id() != transfer.getAccount_from()){
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User cannot Approve their own requests");
+                    }
+                    transferDao.approveTransaction(transferData.getId());
+                    break;
+                case "Rejected":
+                    if(account.getAccount_id() != transfer.getAccount_from()){
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User cannot Approve their own requests");
+                    }
+                    transferDao.rejectTransaction(transferData.getId());
+                    break;
+                case "Canceled":
+                    if(account.getAccount_id() != transfer.getAccount_to()){
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Sender cannot cancel requests, did you mean Reject?");
+                    }
+                    transferDao.cancelTransaction(transferData.getId());
+                    break;
+                default:
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid transfer status");
             }
-            Transfer fullTransfer = transferDao.getTransferById(transfer.getId());
-            if (fullTransfer.getTransfer_status_id() != 1) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot change the status of an already approved or rejected transfer");
-            }
-            transferDao.updateTransactionStatus(transfer.getId(), status.getTransfer_status_id());
-            if (status.getTransfer_status_id() == 2) {
-                accountDao.transferBalance(fullTransfer.getAccount_from(), fullTransfer.getAccount_to(), fullTransfer.getAmount());
-            }
+            accountDao.transferBalance(transfer.getAccount_from(), transfer.getAccount_to(), transfer.getAmount());
         } catch (DaoException err) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Our servers are having difficulties");
         }

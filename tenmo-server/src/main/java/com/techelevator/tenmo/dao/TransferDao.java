@@ -105,10 +105,30 @@ public class TransferDao {
         return id;
     }
 
-    public void updateTransactionStatus(int id, int status_id) {
-        String sql = "UPDATE transfer SET transfer_status_id = ? WHERE transfer_id = ?";
+    public void approveTransaction(int id){
+        String sql = "UPDATE transfer SET transfer_status_id = 2 WHERE transfer_id = ?";
         try {
-            jdbcTemplate.update(sql, status_id, id);
+            jdbcTemplate.update(sql, id);
+        }
+        catch (DataAccessException err){
+            throw new DaoException();
+        }
+    }
+
+    public void rejectTransaction(int id){
+        String sql = "UPDATE transfer SET transfer_status_id = 3 WHERE transfer_id = ?";
+        try {
+            jdbcTemplate.update(sql, id);
+        }
+        catch (DataAccessException err){
+            throw new DaoException();
+        }
+    }
+
+    public void cancelTransaction(int id){
+        String sql = "UPDATE transfer SET transfer_status_id = 4 WHERE transfer_id = ?";
+        try {
+            jdbcTemplate.update(sql, id);
         }
         catch (DataAccessException err){
             throw new DaoException();
