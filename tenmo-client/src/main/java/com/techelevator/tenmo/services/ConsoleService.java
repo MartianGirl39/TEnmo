@@ -3,7 +3,6 @@ package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.model.UserCredentials;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -61,13 +60,18 @@ public class ConsoleService {
         return scanner.nextLine().strip();
     }
 
-    public int promptForInt(String prompt) {
-        System.out.print(prompt);
+    public int promptForInt(String prompt, int min, int max) {
         while (true) {
+            System.out.print(prompt);
             try {
-                return Integer.parseInt(scanner.nextLine());
+                int choice = Integer.parseInt(scanner.nextLine());
+                if (choice >= min && choice <= max) {
+                    return choice;
+                } else {
+                    System.out.println("Please enter a number between " + min + " and " + max + ".");
+                }
             } catch (NumberFormatException e) {
-                System.out.println("Please enter a number.");
+                System.out.println("Please enter a valid number.");
             }
         }
     }
@@ -91,6 +95,7 @@ public class ConsoleService {
     public void printErrorMessage() {
         System.out.println("An error occurred. Check the log for details.");
     }
+
     public static String readAsciiArtFromFile(String filePath) {
         try {
             return Files.readString(Paths.get(filePath));
