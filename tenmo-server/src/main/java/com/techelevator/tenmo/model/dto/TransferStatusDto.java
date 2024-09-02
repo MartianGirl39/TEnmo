@@ -4,7 +4,6 @@ public class TransferStatusDto {
     // transfer id
     int id;
     // account id that's sending it
-    int sendingAccount;
     //status code of transfer
     String status;
 
@@ -14,14 +13,6 @@ public class TransferStatusDto {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getSendingAccount() {
-        return sendingAccount;
-    }
-
-    public void setSendingAccount(int sendingAccount) {
-        this.sendingAccount = sendingAccount;
     }
 
     public String getStatus() {

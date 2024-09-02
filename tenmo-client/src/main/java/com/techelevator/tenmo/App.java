@@ -403,7 +403,6 @@ public class App extends JFrame {
             int option = consoleService.promptForInt("Press 1 to approve \nPress 2 to reject: ");
             TransferStatusDto updated = new TransferStatusDto();
             updated.setId(transfer.getTransfer_id());
-            updated.setSendingAccount(transfer.getSender().getAccount_id());
             if (option == 1) {
                 updated.setStatus("Approved");
                 try {
