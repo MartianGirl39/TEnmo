@@ -174,15 +174,15 @@ public class AccountDao {
         List<AccountDto> account = new ArrayList<>();
         // select every account from account
         String sql = "SELECT account.account_id, tenmo_user.username, tenmo_user.first_name, tenmo_user.last_name FROM account JOIN tenmo_user ON tenmo_user.user_id = account.user_id LEFT JOIN friend ON user_1 = account_id OR user_2 = account_id WHERE account_id != ? AND (user_1 = ? OR user_2 = ?)";
-//        try {
+        try {
             SqlRowSet results = jdbcTemplate.queryForRowSet(sql, userAccount, userAccount, userAccount);
             while (results.next()) {
                 account.add(mapRowToAccountDto(results));
             }
-//        }
-//        catch (DataAccessException err) {
-//            throw new DaoException();
-//        }
+        }
+        catch (DataAccessException err) {
+            throw new DaoException();
+        }
         return account;
     }
 

@@ -2,11 +2,6 @@ package com.techelevator.tenmo.controller;
 
 import com.techelevator.tenmo.dao.*;
 import com.techelevator.tenmo.exception.DaoException;
-import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.User;
-import com.techelevator.tenmo.model.dto.response.ClientTransferDto;
-import com.techelevator.tenmo.model.dto.request.TransferDto;
-import com.techelevator.tenmo.model.dto.request.TransferStatusDto;
 import com.techelevator.tenmo.model.dto.response.AccountDto;
 import com.techelevator.tenmo.model.dto.response.UserAccountDto;
 import com.techelevator.tenmo.service.AccountValidationService;
@@ -77,47 +72,12 @@ public class AccountController {
 
     @RequestMapping(path = "/user/accounts", method = RequestMethod.GET)
     public List<AccountDto> getUsers(Principal principal) {
-//        try {
+        try {
             UserAccountDto account = accountValidationService.getAndValidateUser(principal.getName());
             List<AccountDto> accounts = accountDao.getAccounts(account.getAccount_id());
             return accounts;
-//        } catch (DaoException err) {
-//            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Our servers are having difficulties");
-//        }
+        } catch (DaoException err) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Our servers are having difficulties");
+        }
     }
-
-//    @RequestMapping(path = "/user/account/transfer/{id}", method = RequestMethod.GET)
-//    public ClientTransferDto getTransferById2(@PathVariable int id) {
-//        try {
-//            ClientTransferDto transfer = transferDao.getClientTransferById(id);
-//            if (transfer == null) {
-//                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find transaction");
-//            }
-//            return transfer;
-//        } catch (DaoException err) {
-//            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Our servers are having difficulties");
-//        }
-//    }
-
-//    @RequestMapping(path = "/user/account/transfers/pending", method = RequestMethod.GET)
-//    public List<ClientTransferDto> getAllTransfersForUserByStatus(Principal principal) {
-//        try {
-//            UserAccountDto account = accountValidationService.getAndValidateUser(principal.getName());
-//            return transferDao.getTransfersByStatus(account.getAccount_id());
-//        } catch (DaoException err) {
-//            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Our servers are having difficulties");
-//        }
-//    }
-
-//    private UserAccountDto getAndValidateUser(String username) {
-//        User user = userDao.getUserByUsername(username);
-//        if (user == null) {
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find user, are you logged in as a valid TEnmo user?");
-//        }
-//        UserAccountDto account = accountDao.getAccountByUserId(user.getId());
-//        if (account == null) {
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find account, are you logged in as a valid TEnmo user?");
-//        }
-//        return account;
-//    }
 }
