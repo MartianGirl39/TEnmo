@@ -1,4 +1,4 @@
-package com.techelevator.tenmo.model.dto;
+package com.techelevator.tenmo.model.dto.request;
 
 public class TransferStatusDto {
     // transfer id

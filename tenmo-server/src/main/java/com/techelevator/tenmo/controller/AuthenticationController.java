@@ -3,7 +3,7 @@ package com.techelevator.tenmo.controller;
 import javax.validation.Valid;
 
 import com.techelevator.tenmo.exception.DaoException;
-import com.techelevator.tenmo.model.LoginResponseDto;
+import com.techelevator.tenmo.model.dto.response.LoginResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.techelevator.tenmo.dao.UserDao;
-import com.techelevator.tenmo.model.LoginDto;
-import com.techelevator.tenmo.model.RegisterUserDto;
+import com.techelevator.tenmo.model.dto.request.LoginDto;
+import com.techelevator.tenmo.model.dto.request.RegisterUserDto;
 import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.security.jwt.TokenProvider;
 import org.springframework.web.server.ResponseStatusException;

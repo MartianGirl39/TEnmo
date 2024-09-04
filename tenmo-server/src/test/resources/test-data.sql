@@ -55,6 +55,7 @@ CREATE TABLE transfer (
 	account_from int NOT NULL,
 	account_to int NOT NULL,
 	amount decimal(13, 2) NOT NULL,
+	message NOT NULL DEFAULT '',
 	CONSTRAINT PK_transfer PRIMARY KEY (transfer_id),
 	CONSTRAINT FK_transfer_account_from FOREIGN KEY (account_from) REFERENCES account (account_id),
 	CONSTRAINT FK_transfer_account_to FOREIGN KEY (account_to) REFERENCES account (account_id),
@@ -78,18 +79,12 @@ INSERT INTO tenmo_user (username,password_hash,role) VALUES ('user3','user3','RO
 
 INSERT INTO account (user_id, balance) VALUES (1001, 1000);
 INSERT INTO account (user_id, balance) VALUES (1002, 1000);
-INSERT INTO account (user_id, balance) VALUES (1003, 1000)
+INSERT INTO account (user_id, balance) VALUES (1003, 1000);
 
-INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) VALUES (1, 1, 2001, 2002, 100);
-INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) VALUES (1, 1, 2003, 2001, 50);
-INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) VALUES (1, 1, 2003, 2002, 200);
-
-INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) VALUES (2, 2, 2001, 2002, 70);
-INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) VALUES (2, 2, 2001, 2003, 20);
-INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) VALUES (2, 2, 2003, 2002, 300);
-
-INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) VALUES (1, 3, 2001, 2002, 110);
-INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) VALUES (1, 3, 2003, 2001, 60);
-INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) VALUES (1, 3, 2003, 2002, 150);
+INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount, message) VALUES (1, 1, 2001, 2002, 100, "user1 to user2");
+INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount, message) VALUES (2, 2, 2002, 2001, 100, "user2 to user1");
+INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount, message) VALUES (1, 2, 2001, 2003, 100, "user1 to user3");
+INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount, message) VALUES (1, 3, 2003, 2001, 100, "user3 to user1");
+INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount, message) VALUES (1, 4, 2003, 2002, 100, "user3 to user2");
 
 COMMIT TRANSACTION;

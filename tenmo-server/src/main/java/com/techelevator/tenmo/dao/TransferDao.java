@@ -3,8 +3,9 @@ package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.exception.DaoException;
 import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.dto.AccountDto;
-import com.techelevator.tenmo.model.dto.ClientTransferDto;
+import com.techelevator.tenmo.model.dto.request.TransferDto;
+import com.techelevator.tenmo.model.dto.response.AccountDto;
+import com.techelevator.tenmo.model.dto.response.ClientTransferDto;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -81,11 +82,14 @@ public class TransferDao {
     }
 
 
-    public int sendTeBucks(int senderId, int receiverId, double amount, String message) {
-        int id = 0;
-        String sql = "insert into transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount, message) values(2,2,?,?,?,? ) returning transfer_id;";
+    public int sendTeBucks(int senderId, TransferDto transferData) {
+        int id = -1;
+        String sql = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount, message) values(2,2,?,?,?,?) returning transfer_id;";
         try {
-            id = jdbcTemplate.queryForObject(sql, int.class, senderId, receiverId, amount, message);
+            id = jdbcTemplate.queryForObject(sql, int.class, senderId, transferData.getAccount(), transferData.getAmount(), transferData.getMessage());
+            if (this.getTransferById(id) != null) {
+                System.out.println("Creating friend");
+            }
         }
         catch (DataAccessException err){
             throw new DaoException();
@@ -93,11 +97,11 @@ public class TransferDao {
         return id;
     }
 
-    public int requestTeBucks(int senderId, int receiverId, double amount, String message) {
+    public int requestTeBucks(int receiverId, TransferDto transferData) {
         int id = 0;
         String sql = "insert into transfer (transfer_type_id,transfer_status_id,account_from,account_to,amount, message) values(1,1,?,?,?,?) returning transfer_id;";
         try {
-            id = jdbcTemplate.queryForObject(sql, int.class, senderId, receiverId, amount, message);
+            id = jdbcTemplate.queryForObject(sql, int.class, transferData.getAccount(), receiverId, transferData.getAmount(), transferData.getMessage());
         }
         catch (DataAccessException err){
             throw new DaoException();
@@ -109,6 +113,7 @@ public class TransferDao {
         String sql = "UPDATE transfer SET transfer_status_id = 2 WHERE transfer_id = ?";
         try {
             jdbcTemplate.update(sql, id);
+            Transfer transfer = this.getTransferById(id);
         }
         catch (DataAccessException err){
             throw new DaoException();
@@ -129,6 +134,16 @@ public class TransferDao {
         String sql = "UPDATE transfer SET transfer_status_id = 4 WHERE transfer_id = ?";
         try {
             jdbcTemplate.update(sql, id);
+        }
+        catch (DataAccessException err){
+            throw new DaoException();
+        }
+    }
+
+    public void setTransactionFailed(int id){
+        String sql = "UPDATE transfer SET transfer_status_id = 5 WHERE transfer_id = ?";
+        try {
+            jdbcTemplate.update(sql,id);
         }
         catch (DataAccessException err){
             throw new DaoException();

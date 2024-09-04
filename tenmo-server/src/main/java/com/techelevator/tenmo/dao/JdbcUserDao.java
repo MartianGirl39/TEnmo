@@ -1,7 +1,7 @@
 package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.exception.DaoException;
-import com.techelevator.tenmo.model.RegisterUserDto;
+import com.techelevator.tenmo.model.dto.request.RegisterUserDto;
 import com.techelevator.tenmo.model.User;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
@@ -75,10 +75,10 @@ public class JdbcUserDao implements UserDao {
     public User createUser(RegisterUserDto user) {
         User newUser = null;
         // create user
-        String sql = "INSERT INTO tenmo_user (username, password_hash) VALUES (LOWER(TRIM(?)), ?) RETURNING user_id";
+        String sql = "INSERT INTO tenmo_user (username, password_hash, first_name, last_name) VALUES (LOWER(TRIM(?)), ?, ?, ?) RETURNING user_id";
         String password_hash = new BCryptPasswordEncoder().encode(user.getPassword());
         try {
-            int newUserId = jdbcTemplate.queryForObject(sql, int.class, user.getUsername(), password_hash);
+            int newUserId = jdbcTemplate.queryForObject(sql, int.class, user.getUsername(), password_hash, user.getFirst_name(), user.getLast_name());
             newUser = getUserById(newUserId);
             if (newUser != null) {
                 // create account

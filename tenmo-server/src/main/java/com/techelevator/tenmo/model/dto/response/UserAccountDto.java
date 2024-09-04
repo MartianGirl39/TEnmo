@@ -1,4 +1,4 @@
-package com.techelevator.tenmo.model.dto;
+package com.techelevator.tenmo.model.dto.response;
 
 public class UserAccountDto extends AccountDto {
     double balance;

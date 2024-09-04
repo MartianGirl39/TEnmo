@@ -1,4 +1,4 @@
-package com.techelevator.tenmo.model.dto;
+package com.techelevator.tenmo.model.dto.response;
 
 public class ClientTransferDto {
     private int transfer_id;
@@ -8,6 +8,19 @@ public class ClientTransferDto {
     private String type;
     private double amount;
     private String message;
+
+    public ClientTransferDto(){
+
+    }
+    public ClientTransferDto(int id, String type, String status, AccountDto sender, AccountDto receiver, double amount, String message) {
+        this.transfer_id = id;
+        this.type = type;
+        this.status = status;
+        this.sender = sender;
+        this.receiver = receiver;
+        this.amount = amount;
+        this.message = message;
+    }
 
     public int getTransfer_id() {
         return transfer_id;
