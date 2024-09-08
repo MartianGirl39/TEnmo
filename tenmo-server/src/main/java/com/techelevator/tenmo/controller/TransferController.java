@@ -6,6 +6,7 @@ import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.dto.request.TransferDto;
 import com.techelevator.tenmo.model.dto.request.TransferStatusDto;
+import com.techelevator.tenmo.model.dto.response.ClientGroupMemberDto;
 import com.techelevator.tenmo.model.dto.response.ClientTransferDto;
 import com.techelevator.tenmo.model.dto.response.UserAccountDto;
 import com.techelevator.tenmo.service.AccountValidationService;
@@ -21,7 +22,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping(path="/user/account")
+@RequestMapping(path="/api")
 @PreAuthorize("isAuthenticated()")
 public class TransferController {
 
@@ -61,6 +62,16 @@ public class TransferController {
         try {
             UserAccountDto account = validator.getAndValidateUser(principal.getName());
             return transferDao.getTransfersByStatus(account.getAccount_id());
+        } catch (DaoException err) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Our servers are having difficulties");
+        }
+    }
+
+    @RequestMapping(path = "/transfers/group/{groupId}/expense/{expenseId}", method = RequestMethod.GET)
+    public List<ClientTransferDto> getAllTransfersForUserByStatus(@PathVariable int groupId, @PathVariable int expenseId, Principal principal) {
+        try {
+            ClientGroupMemberDto member = validator.getAndValidateGroupMember(groupId, principal);
+            return transferDao.getTransfersRelatedToExpense(expenseId);
         } catch (DaoException err) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Our servers are having difficulties");
         }
@@ -120,13 +131,13 @@ public class TransferController {
                     if(account.getAccount_id() != transfer.getAccount_from()){
                         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User cannot Approve their own requests");
                     }
-                    transferDao.rejectTransaction(transferData.getId());
+                    transferDao.updateTransactionStatus(3, transferData.getId());
                     break;
                 case "Canceled":
                     if(account.getAccount_id() != transfer.getAccount_to()){
                         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Sender cannot cancel requests, did you mean Reject?");
                     }
-                    transferDao.cancelTransaction(transferData.getId());
+                    transferDao.updateTransactionStatus(4, transferData.getId());
                     break;
                 default:
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid transfer status");

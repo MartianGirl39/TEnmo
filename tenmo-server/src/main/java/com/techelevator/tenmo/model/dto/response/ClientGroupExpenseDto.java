@@ -1,65 +1,65 @@
 package com.techelevator.tenmo.model.dto.response;
 
 import com.techelevator.tenmo.model.dto.request.GroupExpenseDto;
+import com.techelevator.tenmo.model.dto.request.SeriesDto;
 
 import java.time.LocalDate;
 
-public class ClientGroupExpenseDto extends GroupExpenseDto {
-    private double totalGiven;
+public class ClientGroupExpenseDto {
+    int expense_id;
     private String status;
+    AccountDto account;
+    private String name;
+    private String description;
+    private double total;
+    private LocalDate due_date;
 
-    public ClientGroupExpenseDto(){
-
+    public int getExpense_id() {
+        return expense_id;
     }
 
-    public double getTotalNeeded() {
-        return super.getTotalNeeded();
+    public void setExpense_id(int expense_id) {
+        this.expense_id = expense_id;
     }
-
-    public void setTotalNeeded(double totalNeeded) {
-        super.setTotalNeeded(totalNeeded);
-    }
-
 
     public String getName() {
-        return super.getName();
+        return name;
     }
 
     public void setName(String name) {
-        super.setName(name);
+        this.name = name;
     }
 
     public String getDescription() {
-        return super.getDescription();
+        return description;
     }
 
     public void setDescription(String description) {
-        super.setDescription(description);
+        this.description = description;
     }
 
-
-    public double getTotalGiven() {
-        return totalGiven;
+    public double getTotal() {
+        return total;
     }
 
-    public void setTotalGiven(double totalGiven) {
-        this.totalGiven = totalGiven;
+    public void setTotal(double total) {
+        this.total = total;
     }
 
-    public LocalDate getDate() {
-        return super.getDate();
+    public LocalDate getDue_date() {
+        return due_date;
     }
 
-    public void setDate(LocalDate date) {
-        super.setDate(date);
+    public void setDue_date(LocalDate due_date) {
+        this.due_date = due_date;
     }
 
-    public boolean isRepeating() {
-        return super.isRepeating();
+    public AccountDto getAccount() {
+        return account;
     }
 
-    public void setRepeating(boolean repeating) {
-        super.setRepeating(repeating);
+    public void setAccount(AccountDto account) {
+        this.account = account;
     }
 
     public String getStatus() {

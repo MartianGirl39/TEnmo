@@ -1,14 +1,19 @@
 package com.techelevator.tenmo.model.dto.request;
 
+import com.techelevator.tenmo.model.dto.response.AccountDto;
+import org.apache.tomcat.jni.Local;
+
 import java.time.LocalDate;
+import java.util.Optional;
 
 public class GroupExpenseDto {
-    private String name; //TODO: add to database
-    private String description; //TODO: add to database
-    private double totalNeeded;
-
-    private LocalDate date;
+    private String name;
+    private String description;
+    private double total;
+    private LocalDate due_date;
     private boolean repeating;
+    private SeriesDto series;
+    int account_owed;
 
     public GroupExpenseDto(){
 
@@ -30,20 +35,20 @@ public class GroupExpenseDto {
         this.description = description;
     }
 
-    public double getTotalNeeded() {
-        return totalNeeded;
+    public double getTotal() {
+        return total;
     }
 
-    public void setTotalNeeded(double totalNeeded) {
-        this.totalNeeded = totalNeeded;
+    public void setTotal(double total) {
+        this.total = total;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public LocalDate getDue_date() {
+        return due_date;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public void setDue_date(LocalDate due_date) {
+        this.due_date = due_date;
     }
 
     public boolean isRepeating() {
@@ -52,5 +57,21 @@ public class GroupExpenseDto {
 
     public void setRepeating(boolean repeating) {
         this.repeating = repeating;
+    }
+
+    public SeriesDto getSeries() {
+        return series;
+    }
+
+    public void setSeries(SeriesDto series) {
+        this.series = series;
+    }
+
+    public int getAccount_owed() {
+        return account_owed;
+    }
+
+    public void setAccount_owed(int account_owed) {
+        this.account_owed = account_owed;
     }
 }

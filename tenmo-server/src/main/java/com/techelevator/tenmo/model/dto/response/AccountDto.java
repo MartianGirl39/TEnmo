@@ -37,4 +37,14 @@ public class AccountDto {
     public void setLast_name(String last_name) {
         this.last_name = last_name;
     }
+
+    @Override
+    public String toString() {
+        return "AccountDto{" +
+                "account_id=" + account_id +
+                ", username='" + username + '\'' +
+                ", first_name='" + first_name + '\'' +
+                ", last_name='" + last_name + '\'' +
+                '}';
+    }
 }

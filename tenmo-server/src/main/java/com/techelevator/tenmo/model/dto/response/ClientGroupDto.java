@@ -4,7 +4,7 @@ public class ClientGroupDto {
     int group_id;
     String group_name;
     String description;
-    GroupMemberDto creator;
+    ClientGroupMemberDto creator;
 
     public ClientGroupDto(){
 
@@ -26,11 +26,11 @@ public class ClientGroupDto {
         this.group_name = group_name;
     }
 
-    public GroupMemberDto getCreator() {
+    public ClientGroupMemberDto getCreator() {
         return creator;
     }
 
-    public void setCreator(GroupMemberDto creator) {
+    public void setCreator(ClientGroupMemberDto creator) {
         this.creator = creator;
     }
 

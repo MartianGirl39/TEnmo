@@ -16,6 +16,7 @@ import java.util.List;
 
 @RestController
 @PreAuthorize("isAuthenticated()")
+@RequestMapping("/api")
 public class AccountController {
 
     @Autowired
@@ -25,7 +26,7 @@ public class AccountController {
     @Autowired
     AccountValidationService accountValidationService;
 
-    @RequestMapping(path = "/user/account/balance", method = RequestMethod.GET)
+    @RequestMapping(path = "/account/balance", method = RequestMethod.GET)
     public double getAccountBalance(Principal principal) {
         try {
             UserAccountDto account = accountValidationService.getAndValidateUser(principal.getName());
@@ -39,7 +40,7 @@ public class AccountController {
         }
     }
 
-    @RequestMapping(path = "/user/account", method = RequestMethod.GET)
+    @RequestMapping(path = "/account", method = RequestMethod.GET)
     public AccountDto getUserAccount(@RequestParam(required = false) String username, Principal principal) {
         AccountDto account = null;
         try {
@@ -57,7 +58,7 @@ public class AccountController {
         }
     }
 
-    @RequestMapping(path = "/user/account/{id}", method = RequestMethod.GET)
+    @RequestMapping(path = "/account/{id}", method = RequestMethod.GET)
     public AccountDto getUserById(@PathVariable int id) {
         try {
             AccountDto account = accountDao.getAccountDtoById(id);
@@ -70,7 +71,7 @@ public class AccountController {
         }
     }
 
-    @RequestMapping(path = "/user/accounts", method = RequestMethod.GET)
+    @RequestMapping(path = "/accounts", method = RequestMethod.GET)
     public List<AccountDto> getUsers(Principal principal) {
         try {
             UserAccountDto account = accountValidationService.getAndValidateUser(principal.getName());

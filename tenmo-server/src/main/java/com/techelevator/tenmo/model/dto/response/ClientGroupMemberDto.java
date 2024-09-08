@@ -1,12 +1,10 @@
 package com.techelevator.tenmo.model.dto.response;
 
-import com.techelevator.tenmo.model.dto.response.AccountDto;
-
-public class GroupMemberDto {
+public class ClientGroupMemberDto {
     AccountDto account;
     String member_role;
 
-    public GroupMemberDto(){
+    public ClientGroupMemberDto(){
 
     }
 

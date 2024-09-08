@@ -2,19 +2,22 @@ package com.techelevator.tenmo.model.dto.response;
 
 import com.techelevator.tenmo.model.dto.response.AccountDto;
 
+import javax.validation.constraints.Min;
+
 public class ContributionDto {
-    AccountDto account;
+    ClientGroupMemberDto account;
+    @Min(0)
     double amount;
 
     public ContributionDto(){
 
     }
 
-    public AccountDto getAccount() {
+    public ClientGroupMemberDto getAccount() {
         return account;
     }
 
-    public void setAccount(AccountDto account) {
+    public void setAccount(ClientGroupMemberDto account) {
         this.account = account;
     }
 

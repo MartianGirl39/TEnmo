@@ -2,7 +2,7 @@ ROLLBACK;
 
 BEGIN TRANSACTION;
 
-DROP TABLE IF EXISTS group_expense_contribution, group_expense, friend, friend_group_member, friend_group,transfer, account, tenmo_user, transfer_type, transfer_status;
+DROP TABLE IF EXISTS group_expense_series, expense_status, group_expense_contribution, group_expense, friend, friend_group_member, friend_group, transfer, account, tenmo_user, transfer_type, transfer_status;
 DROP SEQUENCE IF EXISTS seq_user_id, seq_account_id, seq_transfer_id;
 
 
@@ -80,6 +80,8 @@ CREATE TABLE friend (
 CREATE TABLE friend_group (
 	group_id serial NOT NULL,
 	group_name varchar(50) NOT NULL,
+	date_created date NOT NULL,
+	description varchar(200) NOT NULL,
 	creator_id int NOT NULL,
 	CONSTRAINT PK_groups PRIMARY KEY (group_id),
 	CONSTRAINT FK_creator FOREIGN KEY (creator_id) REFERENCES account (account_id)
@@ -94,17 +96,43 @@ CREATE TABLE friend_group_member (
 	CONSTRAINT FK_group_member FOREIGN KEY (member_id) REFERENCES account (account_id)
 );
 
+CREATE TABLE expense_status (
+	expense_status_id serial NOT NULL,
+	expense_status_desc varchar(50) NOT NULL,
+	CONSTRAINT PK_expense_status_id PRIMARY KEY (expense_status_id)
+);
+
+CREATE TABLE group_expense_series (
+	series_id serial NOT NULL,
+	frequency_in_days int DEFAULT 1,
+	end_date date,
+	CONSTRAINT PK_group_series PRIMARY KEY(series_id)
+);
+
 CREATE TABLE group_expense (
 	expense_id serial NOT NULL,
 	group_id int NOT NULL,
 	total_needed decimal NOT NULL,
-	total_given decimal NOT NULL,
 	due_date date,
-	transfer_status_id int NOT NULL,
+	expense_status_id int NOT NULL DEFAULT 1,
 	repeating boolean DEFAULT 'false',
+	receiving_account int NOT NULL,
+	series_id int NOT NULL DEFAULT 1,
+	name varchar(50) NOT NULL,
+	description varchar(200) NOT NULL,
 	CONSTRAINT PK_expnese PRIMARY KEY (expense_id),
 	CONSTRAINT FK_expense_group FOREIGN KEY (group_id) REFERENCES friend_group (group_id),
-	CONSTRAINT FK_expense_status FOREIGN KEY (transfer_status_id) REFERENCES transfer_status(transfer_status_id)
+	CONSTRAINT FK_expense_status FOREIGN KEY (expense_status_id) REFERENCES expense_status(expense_status_id),
+	CONSTRAINT FK_expense_account_id FOREIGN KEY (receiving_account) REFERENCES account(account_id),
+	CONSTRAINT FK_expense_series_id FOREIGN KEY (series_id) REFERENCES group_expense_series(series_id)
+);
+
+CREATE TABLE expense_transfer(
+	transfer_id int NOT NULL,
+	expense_id int NOT NULL,
+	CONSTRAINT PK_expense_transfer PRIMARY KEY (transfer_id, expense_id),
+	CONSTRAINT FK_transfer_id FOREIGN KEY (transfer_id) REFERENCES transfer(transfer_id),
+	CONSTRAINT FK_expense_id FOREIGN KEY (expense_id) REFERENCES group_expense(expense_id)
 );
 
 CREATE TABLE group_expense_contribution (
@@ -124,5 +152,10 @@ INSERT INTO transfer_status (transfer_status_desc) VALUES ('Failed');
 
 INSERT INTO transfer_type (transfer_type_desc) VALUES ('Request');
 INSERT INTO transfer_type (transfer_type_desc) VALUES ('Send');
+
+INSERT INTO expense_status (expense_status_desc) VALUES ('Pending');
+INSERT INTO expense_status (expense_status_desc) VALUES ('Settled');
+
+INSERT INTO group_expense_series (frequency_in_days, end_date) VALUES (0, NULL);
 
 COMMIT;
