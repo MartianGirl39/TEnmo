@@ -122,7 +122,7 @@ public class GroupController {
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @RequestMapping(path="/group/{id}/member/{accountId}", method=RequestMethod.GET)
+    @RequestMapping(path="/group/{id}/member/{accountId}", method=RequestMethod.POST)
     public void deleteMember(@PathVariable int id, @PathVariable int accountId, Principal principal){
         AccountDto memberAccount = null;
         ClientGroupMemberDto member = validator.getAndValidateGroupMember(id, principal);
@@ -177,7 +177,7 @@ public class GroupController {
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)
-    @RequestMapping(path="group/{groupId}/expense/{expenseId}", method=RequestMethod.PUT)
+    @RequestMapping(path="group/{groupId}/expense/{expenseId}", method=RequestMethod.POST)
     public void deleteExpenseById(@PathVariable int groupId, @PathVariable int expenseId, Principal principal){
         ClientGroupExpenseDto expense = null;
         validator.getAndValidateGroupMember(groupId, principal);
@@ -228,7 +228,7 @@ public class GroupController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(path="group/{groupId}/expense{expenseId}/contribution/{memberId}", method=RequestMethod.POST)
-    public void deleteExpenseContributionById(@PathVariable int groupId, @PathVariable int expenseId, @PathVariable int memberId, Principal principal){
+    public void deleteExpenseContribution(@PathVariable int groupId, @PathVariable int expenseId, @PathVariable int memberId, Principal principal){
         ContributionDto contribution = null;
         validator.getAndValidateGroupMember(groupId, principal);
         contribution = expenseDao.getExpenseContribution(expenseId, memberId);
